@@ -12,6 +12,10 @@ from i611_io import *
 from i611shm import * 
 import socket
 
+# for test
+ip_addr = 'localhost'
+port = 5000
+
 def main():
     ## 2. 초기 설정② ####################################
     # ZERO 로봇 생성자 
@@ -22,19 +26,13 @@ def main():
     rb.open()
     # I/O 입출력 기능의 초기화 
     IOinit( rb )
-    # 교시 데이터 파일 읽기
-    data = Teachdata( "teach_data" )
-    ## 1. 교시 포인트 설정 ######################
-    p1 = Position( -418.30, -398.86, 287.00, 0, 0, -180 )
-    p2 = Position( -158.54, -395.10, 287.00, 0, 0, -180 )
-    ## 2. 동작 조건 설정 ######################## 
     m = MotionParam( jnt_speed=10, lin_speed=10, pose_speed=10, overlap = 30 )
     #MotionParam 형으로 동작 조건 설정
     rb.motionparam( m )
    
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1) #(level, optname, value: int) 주어진 소켓 옵션의 값을 설정
-    sock.connect(('192.168.0.20',5000)) #address에 있는 원격 소켓에 연결
+    sock.connect((ip_addr, port)) #address에 있는 원격 소켓에 연결
     
     ## 3. 로봇 동작을 정의 ##############################
     # 작업 시작
