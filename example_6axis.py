@@ -71,7 +71,7 @@ def current_xy_coordi():
     return position_list
 
 def main():
-    ## 2. 초기 설정② ####################################
+    ## 1. 초기 설정② ####################################
     # i611 로봇 생성자
     rb = i611Robot()
     # 좌표계의 정의
@@ -80,34 +80,6 @@ def main():
     rb.open()
     # I/O 입출력 기능의 초기화
     IOinit( rb )
-    # 티칭 데이터 파일 읽기
-    data = Teachdata( "teach_data" )
-    # teach file 에선 x,y,z rz, ry, rx로 줘야함.
-
-    ## 1. 티칭 포인트 불러오기 ###########################
-    # 변수명은 임의로 지정이 가능하고 위에서 import해온 teachdata에서 꺼내쓰는것으로 보면 된다.
-    pick_point1 = data.get_position("pos1",0) # 픽업 1번 포인트 pos1[0]
-    pick_point2 = data.get_position("pos1",1) # 픽업 2번 포인트 pos1[1]
-    pick_point3 = data.get_position("pos1",2) # 픽업 3번 포인트 pos1[2]
-    pick_point4 = data.get_position("pos1",3) # 픽업 4번 포인트 pos1[3]
-
-    place_point1 = data.get_position("pos1",4) # 픽업 1번 포인트 pos1[0]
-    place_point2 = data.get_position("pos1",5) # 픽업 2번 포인트 pos1[1]
-    place_point3 = data.get_position("pos1",6) # 픽업 3번 포인트 pos1[2]
-    place_point4 = data.get_position("pos1",7) # 픽업 4번 포인트 pos1[3]
-    
-    pick_point11 = pick_point1.offset(dz=30) # 픽업 1번 포인트 + z offset
-    place_point11 = place_point1.offset(dz=50) # 플레이스 1번 포인트 + z offset 
-    
-    #### 1.1 티칭 포인트 입력해서 사용 #####################
-    #      Position(x, y, z, rz, ry, rx)
-    # p1 = Position( 95, -280, 425, -120, 0, 180, posture = 7) # 1번 positioin
-    # p2 = Position( 95, -280, 240, 154, 80, -114 ) # 2번 position
-    # p3 = Position( 300, -280, 240, 159, 86, -156 ) # 3번 position
-    #      Joint(j1, j2, j3, j4, j5, j6)
-    # J1 = Joint(90, 90, -100, 180, 0, 0) # 1번 Joint
-    # J2 = Joint(90, 0, -50, 90, 0, 0) # 2번 Joint
-    # J3 = Joint(0, 0, -75, 0, 0, 0) # 3번 Joint
 
     ## 2. 동작 조건 설정 ########################
     # jnt_speed, lin_speed 설명, 한계값 jnt는 %개념이기에 100이 max, line_speed는 매뉴얼에 표기되어있음
@@ -120,26 +92,13 @@ def main():
     motion = MotionParam(jnt_speed=10, lin_speed=150, pose_speed=20, acctime=0.4, dacctime=0.4, overlap=20)
     rb.motionparam(motion) # 위에서 설정한 motionparameter -> 로봇 적용
 
-    rb.enable_interrupt(0,True) # 동작 중에 감속 정지 입력 시의 예외 발생을 활성화
-    rb.enable_interrupt(1,True) # 동작 중에 비상 정지 입력 시의 예외 발생을 활성화
-    rb.enable_interrupt(2,True) # 일시정지 중에 감속 정지 입력 시의 예외 발생을 활성화
-    rb.enable_interrupt(3,True) # 일시정지 중에 비상 정지 입력 시의 예외 발생을 활성화
-    
     event=Event()
     th = threading.Thread(target=th_stop, args=(event, )) # def된 함수를 thread 생성
     th.setDaemon(True) # main 함수와 같이 시작하고 끝나도록 daemon 함수로 설정 (병렬동작이 가능하도록 하는 기능)
     th.start() # thread 동작
     
     ## 3. 로봇 동작을 정의 ##############################
-    # 작업 시작
-    clamp_(2) # gripper open
-    clamp_clear() # 이거 항상 커플로 줘야함
-    # gripper close 가 1번
-    clamp_(1)
-    clamp_clear()
 
-    cnt = 0
-    cycle = 0
     try:
         while True: # 반복문
             input_data = raw_input("[Main] 실행하고자 하는 Mode 입력 (도움말 = h or help) : ")
@@ -368,143 +327,6 @@ def main():
                     rb.sleep(0.001)
                 continue
 
-            if input_data == 'pallet': # pallet 동작, 20개 반송 
-                # pallet 1번 생성
-                pal1 = Pallet() # pallet 생성 method
-                pal1.init_4(pick_point1, pick_point2, pick_point3, pick_point4, 5, 4) # 4점 포인트 바운더리 생성_i=5/j=4, total 20cell 구역
-                pal1.adjust( 3, 2, 0.4, -0.3 ) # 3,2번 셀 x축 +0.4mm/ y축 -0.3mm 보정
-
-                # pallet 2번 생성
-                pal2 = Pallet() # pallet 생성 method
-                pal2.init_4(place_point1, place_point2, place_point3, place_point4, 5, 4) # 4점 포인트 바운더리 생성_i=5/j=4, total 20cell 구역
-                pal2.adjust( 1, 0, 0.4, -0.3 ) # 1,0번 셀 x축 +0.4mm/ y축 -0.3mm 보정
-                print("pallet 동작 시작!")
-                rb.sleep(1)
-                for i in range(5): # i열 5줄
-                    for j in range(4): # j열 4줄
-                        ## 픽업부 #########################
-                        print("i = {0}, j = {1}".format(i,j)) # 작업할 i, j열 위치값 출력
-                        pallet1 = pal1.get_pos(i,j) # 상단부 생성 pallet1번 불러오기
-                        rb.move(pallet1.offset(dz=30)) # 목표위치 z.offset +30mm
-                        rb.line(pallet1) # 목표위치 도달
-
-                        # clamp close
-                        clamp_(1)
-                        clamp_clear()
-
-                        rb.line(pallet1.offset(dz=60))
-
-                        ## 플레이스부 ######################
-                        pallet2 = pal2.get_pos(i,j) # 상단부 생성 pallet2번 불러오기
-                        rb.move(pallet2.offset(dz=60)) # 목표위치 z.offset +60mm
-                        rb.line(pallet2) # 목표위치 도달
-
-                        # clamp open
-                        clamp_(2)
-                        clamp_clear()
-
-                        rb.line(pallet2.offset(dz=30))
-                print("pallet 동작 종료!")
-                continue
-
-            if input_data == 'io_pass': # in 신호 확인 후 다음 스텝 진행, 조건문 활용
-                print("io_pass 동작 시작!")
-                rb.sleep(1)
-                while shm_din(7) == 0:
-                    ############### 기본 동작 1 cycle  #############################
-                    rb.move(pick_point11)
-                    rb.line(pick_point1)
-
-                    clamp_(1)
-                    time.sleep(0.3)
-                    clamp_clear()
-
-                    print("8번 입력이 1이 되면 다음 동작을 진행합니다.")
-                    while shm_din(8) == 0: # 8번 in_signal on시 다음 step 진행
-                        pass
-
-                    rb.line(pick_point11)
-                    rb.move(place_point11)
-                    rb.line(place_point1)
-
-                    clamp_(2)
-                    time.sleep(0.3)
-                    clamp_clear()
-
-                    print("8번 입력이 0이 되면 다음 동작을 진행합니다.")
-                    while shm_din(8) == 1: # 8번 in_signal off시 다음 step 진행
-                        pass
-
-                    rb.line(place_point11)
-
-                    cnt +=1 # count 증가
-                    print(cnt)
-
-                    if not cnt == 2: 
-                        # 1cycle 반복할 때마다 좌표값 변경
-                        pick_point1 = pick_point1.offset(dz=-15)
-                        pick_point11 = pick_point11.offset(dz=-15)
-                        place_point1 = place_point1.offset(dz=15)
-                        place_point11 = place_point11.offset(dz=15)
-
-                    if cnt == 2 :
-                        pick_point1 = pick_point1.offset(dy=-75, dz=15)
-                        pick_point11 = pick_point11.offset(dy=-75, dz=15)
-                        place_point1 = place_point1.offset(dz=15)
-                        place_point11 = place_point11.offset(dz=15)
-                        cnt = 0
-                        cycle +=1
-                        print(cycle)
-
-                    if cycle == 4:
-                        cnt = 0
-                        cycle = 0
-                        pick_point1 = data.get_position("pos1",0) # 픽업 1번 포인트 pos1[0]
-                        pick_point11 = pick_point1.offset(dz=30) # 픽업 1번 포인트 + z offset
-                        place_point1 = data.get_position("pos1",4) # 픽업 1번 포인트 pos1[0]
-                        place_point11 = place_point1.offset(dz=50) # 플레이스 1번 포인트 + z offset 
-                        rb.home()
-                        break
-
-                    rb.sleep(0.001)
-
-                else:
-                    cnt = 0
-                    cycle = 0
-                    pick_point1 = data.get_position("pos1",0) # 픽업 1번 포인트 pos1[0]
-                    pick_point11 = pick_point1.offset(dz=30) # 픽업 1번 포인트 + z offset
-                    place_point1 = data.get_position("pos1",4) # 픽업 1번 포인트 pos1[0]
-                    place_point11 = place_point1.offset(dz=50) # 플레이스 1번 포인트 + z offset 
-                continue
-
-            if input_data == 'mdo': # mdo 기능, 특정구간에서 출력신호 제어
-                print("mdo 동작 준비위치 이동")
-                rb.sleep(1)
-                rb.move(pick_point1)
-                dout(24, '1')
-                # 미리 MDO 동작 설정을 해둡니다
-                rb.set_mdo( 1, 24, 0, 1, 100 ) # 출발 후 100mm 구간 24번 dout(24, "0") 출력 [관리번호 1번에 등록]
-                rb.set_mdo( 8, 24, 1, 2, 100 ) # 도착 전 100mm 구간 24번 dout(24, "1") 출력 [관리번호 8번에 등록]
-                rb.enable_mdo(129) # MDO 관리 번호 1, 8 활성화  1000 0001
-                print("mdo동작 시작!")
-                rb.sleep(1)
-                # 실동작 구간
-                rb.move(place_point4)
-                # MDO 동작을 비활성화합니다
-                # rb.disable_mdo( 129 ) # MDO 관리 번호 1, ８ 비활성화
-                rb.disable_mdo( bitfield=129 ) # MDO 관리 번호１, ８ 비활성화
-                continue
-
-            if input_data == 'pdb': # 프로그램 디버깅용 메소드
-                print("한스텝씩 동작하려면 'n', 연속 동작하려면 'c' 를 입력하세요.")
-                pdb.set_trace() # pdb 기능/ 입력값_ c = continue (전체동작), n = next (한라인씩 스텝동작)
-                clamp_clear()
-                clamp_(1)
-                clamp_clear()
-                clamp_(2)
-                clamp_clear()
-                continue
- 
             if input_data == 'status': # 로봇 시스템 상태확인
                 system_list = rb.get_system_port()
                 print("Running={0}, Svon={1}, Emo={2}, Hw_error={3}, Sw_error={4}, Abs_lost={5}, In_pause={6}, Error={7}".format(\
@@ -534,43 +356,6 @@ def main():
                 print("passm={0}, overlap={1}, zone={2}, pose_speed={3}, ik_solver_option={4}".format(int(mp[5]), round(mp[6],1), int(mp[7]), round(mp[8],1), mp[9]))
                 continue
 
-            if input_data == 'get_location': # 티치데이터 불러오기
-                input_data = raw_input("[get_location] 불러올 포지션 위치 입력 (예시 : pos1,0): ")
-                read_data = input_data.split(',')
-                # [ key, index, tool, base, comment ]
-                #[key, index, tool offset, base offset, comment]
-                read_pos, toolid, baseid, comment = data.get_position(read_data[0],int(read_data[1]),True,True,True)
-                read_pos = read_pos.pos2list()
-                read_pos_x = round(read_pos[0],3)
-                read_pos_y = round(read_pos[1],3)
-                read_pos_z = round(read_pos[2],3)
-                read_pos_rz = round(read_pos[3],3)
-                read_pos_ry = round(read_pos[4],3)
-                read_pos_rx = round(read_pos[5],3)
-                read_posture = read_pos[7]
-                print("{0}[{1}] = ({2}, {3}, {4}, {5}, {6}, {7}, posture={8})".format(\
-                    read_data[0], read_data[1], read_pos_x, read_pos_y, read_pos_z, read_pos_rz, read_pos_ry, read_pos_rx, read_posture))
-                continue
-
-            if input_data == 'set_location': # 티치데이터 저장하기
-                data.close()
-                data.open(False)
-                input_data = raw_input("[set_location] 저장할 포지션 위치 입력 (예시 : pos1,0): ")
-                write_data = input_data.split(',')
-                write_pos_list = current_xy_coordi()
-                write_pos = Position( write_pos_list[0], write_pos_list[1], write_pos_list[2], write_pos_list[3], write_pos_list[4], write_pos_list[5], posture = write_pos_list[6])
-                # [ key, index, tool, base, comment ]
-                data.set_position(write_data[0],int(write_data[1]),write_pos,0,0,"")
-                data.flush()
-                continue
-
-            if input_data == 'goto_location': # 티치데이터 이동하기
-                input_data = raw_input("[goto_location] 이동하려는 포지션 위치 입력 (예시 : pos1,0): ")
-                goto_data = input_data.split(',')
-                print("{0}[{1}] 위치로 이동".format(goto_data[0], int(goto_data[1])))
-                goto_pos = data.get_position(goto_data[0],int(goto_data[1]))
-                rb.move(goto_pos)
-                continue
 
             if input_data == 'exit': # 메인 프로그램 종료
                 break
