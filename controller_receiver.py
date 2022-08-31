@@ -72,31 +72,38 @@ def main():
     motion = MotionParam(jnt_speed=10, lin_speed=150, pose_speed=20, acctime=0.4, dacctime=0.4, overlap=20)
     #MotionParam 형으로 동작 조건 설정
     rb.motionparam(motion)
-   
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1) #(level, optname, value: int) 주어진 소켓 옵션의 값을 설정
-    sock.connect((ip_addr, port)) #address에 있는 원격 소켓에 연결
-    
-    ## 3. 로봇 동작을 정의 ##############################
-    # 작업 시작
-    Socket_data = 'start' #data 인스턴스 생성
-    Socket_data = Socket_data.encode() # 유니코드를 utf-8, euc-kr, ascii 형식의 byte코드로 변환
-    sock.send(Socket_data) #data 전송 
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1)  # (level, optname, value: int) 주어진 소켓 옵션의 값을 설정
+    server_socket.bind((ip_addr, port))  # 서버가 사용할 IP주소와 포트번호를 생성한 소켓에 결합
+    server_socket.listen(0)  # 소켓 서버의 클라이언트의 접속을 기다린다.
+
+    conn, addr = server_socket.accept()  # 요청 수신되면 요청을 받아들여 데이터 통신을 위한 소켓 생성
 
     try:
         while True:
-            Socket_data = sock.recv(65535) #server socket으로부터 data 수신
-            Socket_input = Socket_data.decode() #byte code -> 문자열 변환
+            received_data = conn.recv(1024)  # server socket으로부터 data 수신
+            received_data = received_data.decode()  # byte code -> 문자열 변환
+            received_data = received_data.split(' ')
 
-            if Socket_data =="1": #input data를 1로 입력시
-                print('1')
+            command = received_data[0]
+            if command == "movej":
+                print('movej')
+            elif command == "movel":
+                print('movel')
+            elif command == "getl":
+                print('getl')
+            elif command == "getj":
+                print('getj')
+            elif command == "open_gripper":
+                print('open_gripper')
+            elif command == "close_gripper":
+                print('close_gripper')
 
-            elif Socket_data =="2": #input data를 2로 입력시
-                print('2')
     except KeyboardInterrupt:           # "ctrl" + "c" 버튼 입력
         print("KeyboardInterrupt")
-    except Robot_emo:
-        print("Robot_emo")
+    # except Robot_emo:
+    #     print("Robot_emo")
     except Exception as e:
         print("Error name is : {}".format(e))
     finally:
