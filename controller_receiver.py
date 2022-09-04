@@ -87,19 +87,40 @@ def main():
             received_data = received_data.split(' ')
 
             command = received_data[0]
-            if command == "movej":
-                print('movej')
-            elif command == "movel":
-                print('movel')
+            if command == "movej_rel":
+                joints = [int(i) for i in received_data[1].split(',')]
+                print('movej_rel', joints)
+                rb.reljntmove(dj1=joints[0], dj2=joints[1], dj3=joints[2], dj4=joints[3], dj5=joints[4], dj6=joints[5])
+            elif command == "movej_abs":
+                joints = [int(i) for i in received_data[1].split(',')]
+                print('movej_abs', joints)
+                rb.move(Joint(joints[0], joints[1], joints[2], joints[3], joints[4], joints[5]))
+            elif command == "movel_rel":
+                tcp = [int(i) for i in received_data[1].split(',')]
+                print('movel_rel', tcp)
+                rb.relline(dx=tcp[0], dy=tcp[1], dz=tcp[2], drx=tcp[3], dry=tcp[4], drz=tcp[5])
+            elif command == "movel_abs":
+                tcp = [int(i) for i in received_data[1].split(',')]
+                rb.optline(Position(tcp[0], tcp[1], tcp[2], tcp[5], tcp[4], tcp[3]))
+                print('movel_abs', tcp)
             elif command == "getl":
-                print('getl')
+                cur_pos = current_xy_coordi()
             elif command == "getj":
-                print('getj')
+                cur_pos = current_joint_coordi()
             elif command == "open_gripper":
                 print('open_gripper')
+                clamp_(2)
             elif command == "close_gripper":
                 print('close_gripper')
+                clamp_(1)
+            else:
+                print('invalid format', command)
 
+            if command == 'getl' or command == 'getj':
+                cur_pos = ','.join(str(j) for j in cur_pos)
+                conn.send(cur_pos)
+            else:
+                conn.send('Success')
     except KeyboardInterrupt:           # "ctrl" + "c" 버튼 입력
         print("KeyboardInterrupt")
     # except Robot_emo:
