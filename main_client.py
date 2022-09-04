@@ -6,7 +6,7 @@ home_pose = [0, 0, 0, 0, 0, 0]
 
 def main_yjyoo(agent):
     agent.movej(home_pose, rel=False)
-    print(agent.getl())
+
 
 
 

@@ -17,14 +17,12 @@ class Agent:
         data_encoded = data.encode()  # 문자열 -> byte code 변환
         self.client_socket.sendall(data_encoded)  # client socket으로 data 송신
         data = self.client_socket.recv(1024)
-        print('received', data.decode())
         return data.decode()
 
     def movej(self, joints, rel=False):
         if rel is False:
             msg = 'movej_rel '
             msg += ','.join(str(j) for j in joints)
-            print(msg)
             self.send(msg)
         else:
             msg = 'movej_abs '
@@ -48,4 +46,10 @@ class Agent:
     def getj(self):
         pos = self.send('getj')
         return [int(i) for i in pos.split(',')]
+
+    def open_gripper(self):
+        self.send('open_gripper')
+
+    def close_gripper(self):
+        self.send('close_gripper')
 
