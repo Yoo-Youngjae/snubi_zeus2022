@@ -1,0 +1,32 @@
+Ubuntu 18.04
+GPU: NVIDIA GA104M [GeForce RTX 3070 Mobile/Max-Q]
+-> Compute Capability: 8.6
+$ export TORCH_CUDA_ARCH_LIST=8.6
+cuda 11.3
+
+current cudatoolkit(nvcc -V) version: 9.1
+current GPU Driver(nvidia-smi) version: 11.4
+===================================================
+[Using conda env]
+$ pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu113 (cudatoolkit 11.3)
+python 3.8.13 (Requirement >= 3.7)
+pytorch 1.12.1
+torchvision 0.13.1
+opencv 4.6.0
+
+[install library]
+tqdm
+fvcore
+cloudpickle
+omegaconf
+pycocotools
+fairscale
+timm
+
+[download models - ModelZoo]
+wget https://dl.fbaipublicfiles.com/detectron2/COCO-Detection/faster_rcnn_R_50_FPN_3x/137849458/model_final_280758.pkl
+...
+
+[Check Camera]
+$ v4l2-ctl --list-devices
+
