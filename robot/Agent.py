@@ -20,7 +20,7 @@ class Agent:
         return data.decode()
 
     def movej(self, joints, rel=False):
-        if rel is False:
+        if rel is True:
             msg = 'movej_rel '
             msg += ','.join(str(j) for j in joints)
             self.send(msg)
@@ -29,8 +29,8 @@ class Agent:
             msg += ','.join(str(j) for j in joints)
             self.send(msg)
 
-    def movel(self, tcp, rel=False):
-        if rel is False:
+    def movel(self, tcp, rel=True):
+        if rel is True:
             msg = 'movel_rel '
             msg += ','.join(str(j) for j in tcp)
             self.send(msg)

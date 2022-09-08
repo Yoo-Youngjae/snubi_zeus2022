@@ -8,9 +8,11 @@ from i611_extend import *
 from rbsys import *
 from i611_common import *
 from i611_io import *
-from i611shm import * 
+from i611shm import *
+from threading import Event # event 모듈
 import socket
 
+import os # 운영체제 모듈
 import time # 시간관련 모듈
 import math # 계산관련 모듈
 
@@ -18,6 +20,15 @@ import math # 계산관련 모듈
 ip_addr = 'localhost'
 port = 5000
 
+def th_stop(event):   # thread 함수
+    while True:
+        if event.is_set():
+            return
+        if din(9) == '1': # din(9) = 1일 때 프로그램 종료
+            print("User Program Stop!")
+            pid = os.getpid()
+            os.kill(pid, signal.SIGTERM)    #os signal.SIGKILL
+        time.sleep(0.1)
 
 def clamp_(_mode): # clamp 가 1이라면 dout(48) 출력, 그 외 값은 dout(50) 출력
     if _mode == 1:
@@ -73,6 +84,11 @@ def main():
     #MotionParam 형으로 동작 조건 설정
     rb.motionparam(motion)
 
+    event = Event()
+    th = threading.Thread(target=th_stop, args=(event,))  # def된 함수를 thread 생성
+    th.setDaemon(True)  # main 함수와 같이 시작하고 끝나도록 daemon 함수로 설정 (병렬동작이 가능하도록 하는 기능)
+    th.start()  # thread 동작
+
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1)  # (level, optname, value: int) 주어진 소켓 옵션의 값을 설정
     server_socket.bind((ip_addr, port))  # 서버가 사용할 IP주소와 포트번호를 생성한 소켓에 결합
@@ -123,8 +139,8 @@ def main():
                 conn.send('Success')
     except KeyboardInterrupt:           # "ctrl" + "c" 버튼 입력
         print("KeyboardInterrupt")
-    # except Robot_emo:
-    #     print("Robot_emo")
+    except Robot_emo:
+        print("Robot_emo")
     except Exception as e:
         print("Error name is : {}".format(e))
     finally:
@@ -133,6 +149,7 @@ def main():
 
     ## 4. 종료 ######################################
     # 로봇과의 연결을 종료
+    event.set()
     rb.close()
 if __name__ == '__main__':
     main()
