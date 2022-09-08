@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 from robot.Agent import Agent
 
-home_pos = [0,0,0,0,0,0]
+home_pos = [68, -9, -102, 0, -69, 69]
+gripper_pos = [98, -9, -102, 0, 111, 69]
 if __name__ == '__main__':
     try:
         agent = Agent()
@@ -10,20 +11,24 @@ if __name__ == '__main__':
             test_case = input('command : ')
             if test_case == 'h':
                 agent.movej(home_pos)
+            elif test_case == 'gripper':
+                agent.movej(gripper_pos)
             elif test_case == 'w':
-                agent.movel([0, 0.1, 0, 0, 0, 0])
+                agent.movel([0, 30, 0, 0, 0, 0])
             elif test_case == 's':
-                agent.movel([0, -0.1, 0, 0, 0, 0])
+                agent.movel([0, -30, 0, 0, 0, 0])
             elif test_case == 'a':
-                agent.movel([-0.1, 0, 0, 0, 0, 0])
+                agent.movel([-30, 0, 0, 0, 0, 0])
             elif test_case == 'd':
-                agent.movel([0.1, 0, 0, 0, 0, 0])
+                agent.movel([30, 0, 0, 0, 0, 0])
             elif test_case == 'r':
-                agent.movel([0, 0, 0.1, 0, 0, 0])
+                agent.movel([0, 0, 30, 0, 0, 0])
             elif test_case == 'f':
-                agent.movel([0, 0, -0.1, 0, 0, 0])
-            elif test_case == 'p':
-                agent.close_gripper()
+                agent.movel([0, 0, -30, 0, 0, 0])
+            elif test_case == 'z':
+                agent.movel([0, 0, 0, 0, 0, 10])
+            elif test_case == 'x':
+                agent.movel([0, 0, 0, 0, 0, -10])
             elif test_case == 'l':
                 agent.open_gripper()
             elif test_case == 'getj':

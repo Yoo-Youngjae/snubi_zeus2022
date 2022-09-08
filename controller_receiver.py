@@ -17,7 +17,7 @@ import time # 시간관련 모듈
 import math # 계산관련 모듈
 
 # for test
-ip_addr = 'localhost'
+ip_addr = '192.168.0.23'
 port = 5000
 
 def th_stop(event):   # thread 함수
@@ -89,14 +89,15 @@ def main():
     th.setDaemon(True)  # main 함수와 같이 시작하고 끝나도록 daemon 함수로 설정 (병렬동작이 가능하도록 하는 기능)
     th.start()  # thread 동작
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1)  # (level, optname, value: int) 주어진 소켓 옵션의 값을 설정
-    server_socket.bind((ip_addr, port))  # 서버가 사용할 IP주소와 포트번호를 생성한 소켓에 결합
-    server_socket.listen(0)  # 소켓 서버의 클라이언트의 접속을 기다린다.
-
-    conn, addr = server_socket.accept()  # 요청 수신되면 요청을 받아들여 데이터 통신을 위한 소켓 생성
 
     try:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF,
+                                 1)  # (level, optname, value: int) 주어진 소켓 옵션의 값을 설정
+        server_socket.bind((ip_addr, port))  # 서버가 사용할 IP주소와 포트번호를 생성한 소켓에 결합
+        server_socket.listen(0)  # 소켓 서버의 클라이언트의 접속을 기다린다.
+
+        conn, addr = server_socket.accept()  # 요청 수신되면 요청을 받아들여 데이터 통신을 위한 소켓 생성
         while True:
             received_data = conn.recv(1024)  # server socket으로부터 data 수신
             received_data = received_data.decode()  # byte code -> 문자열 변환
@@ -145,6 +146,7 @@ def main():
         print("Error name is : {}".format(e))
     finally:
         print("finally")
+        conn.close()
         dout(48, '000')
 
     ## 4. 종료 ######################################
