@@ -88,7 +88,7 @@ def main():
     th = threading.Thread(target=th_stop, args=(event,))  # def된 함수를 thread 생성
     th.setDaemon(True)  # main 함수와 같이 시작하고 끝나도록 daemon 함수로 설정 (병렬동작이 가능하도록 하는 기능)
     th.start()  # thread 동작
-
+    print('Start Server Node...')
 
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # INET은 주소패밀리의 기본값, SOCK_STREAM은 소켓 유형의 기본값
@@ -121,9 +121,11 @@ def main():
                 rb.optline(Position(tcp[0], tcp[1], tcp[2], tcp[5], tcp[4], tcp[3]))
                 print('movel_abs', tcp)
             elif command == "getl":
-                cur_pos = current_xy_coordi()
+                current_xy_coordi()
+                # cur_pos = current_xy_coordi()
             elif command == "getj":
-                cur_pos = current_joint_coordi()
+                current_joint_coordi()
+                # cur_pos = current_joint_coordi()
             elif command == "open_gripper":
                 print('open_gripper')
                 clamp_(2)
@@ -133,11 +135,11 @@ def main():
             else:
                 print('invalid format', command)
 
-            if command == 'getl' or command == 'getj':
-                cur_pos = ','.join(str(j) for j in cur_pos)
-                conn.send(cur_pos)
-            else:
-                conn.send('Success')
+            # if command == 'getl' or command == 'getj':
+            #     cur_pos = ','.join(str(j) for j in cur_pos)
+            #     conn.send(cur_pos)
+            # else:
+            conn.send('Success')
     except KeyboardInterrupt:           # "ctrl" + "c" 버튼 입력
         print("KeyboardInterrupt")
     except Robot_emo:
