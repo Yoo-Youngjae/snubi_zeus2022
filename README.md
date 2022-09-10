@@ -1,6 +1,8 @@
 # snubi_zeus2022
 roboworld 2022의 R-BIZ 챌린지를 위한 snubi팀 코드
 
+![server_setting](./assets/figure1.png)  
+
 ### Required environment
 - Ubuntu 20.04
 - Python 3.7
