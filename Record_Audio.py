@@ -5,14 +5,15 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 2 #마이크 입력 시간
+RECORD_SECONDS = 3 #마이크 입력 시간
 #WAVE_OUTPUT_FILENAME = "output.wav"
 #MP3_OUTPUT_FILENAME = "ouput.mp3"
 
 
 def start(WAVE_OUTPUT_FILENAME):
     p = pyaudio.PyAudio()
-    
+
+    # 클래스화
     stream = p.open(format=FORMAT,
                     channels=CHANNELS,
                     rate=RATE,

@@ -43,7 +43,18 @@ detectron model 코드
 3. h로 home_pos 이동, gripper로 그리퍼 갈아끼기 모션으로 이동
 4. 그밖에 추가적으로 필요하신 기능은 if 문 추가해서 만들어 주세요.
 
+### Running Detectron2 with webcam
 
+```Shell
+cd detectron2
+python demo/demo.py\
+    --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml\
+    --webcam\
+    --confidence-threshold 0.5\
+    --opts MODEL.WEIGHTS ../models/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+
+# GPU VRAM COST : 2G 
+```
 Todo
 1. vision 모듈과 연결.
 2. 계산대 ui 모듈과 연결
