@@ -102,7 +102,6 @@ def main():
             received_data = conn.recv(1024)  # server socket으로부터 data 수신
             received_data = received_data.decode()  # byte code -> 문자열 변환
             received_data = received_data.split(' ')
-
             command = received_data[0]
             if command == "movej_rel":
                 joints = [int(i) for i in received_data[1].split(',')]

@@ -3,14 +3,14 @@
 from robot.Agent import Agent
 
 # add jokim
-import Record_Audio
-import Speech_Recognition
-from Text_to_Speech import *
+from stt import Speech_Recognition, Record_Audio
+from stt.Text_to_Speech import Speak_Secnario
 from importlib import reload
+import time
 
 # global variable
 home_pos = [68, -9, -102, 0, -69, 69]
-place_pos = [-26, -8, -94, 0, -78, -25]
+place_pos = [-48, 3, -60, 0, -121, -47]
 
 INPUT_AUDIO = "/home/snubi/PycharmProjects/snubi_zeus2022/stt/audio_data/input_audio.wav"
 basket_pos1 = [21, -2, 143, -86, -139, 176]
@@ -19,28 +19,44 @@ basket_pos2 = [47, 33, 152, -102, -127, 116]
 # basket_pos2 = [19, 27, 127, -103, -139, 155]
 
 def main_yjyoo(agent):
-    # 1. go home posision
-    agent.movej(home_pos, rel=False)
-    # 2. detection object and get distance
-    xyz = [-100, 0, -200]
-    xyz += [0, 0, 0] # for rx,ry,rz
-    # 3. go to the object
-    agent.movel(xyz)
-    z_offset = 10
-    agent.movel([0, 0,-z_offset , 0, 0, 0])
-    # 4. grasp
-    agent.close_gripper()
-    # 5. go to place position
-    agent.movej(place_pos, rel=False)
-    # 6. go to empty place
-    agent.movel([0, 0, -200, 0, 0, 0])
-    # 7. release the gripper
-    agent.open_gripper()
-    # 8. back to the place position
-    agent.movej(place_pos, rel=False)
+    print("Start shopping")
+    agent.belt_on()
+    start_time = time.time()
+    while time.time() - start_time <=60:
+        # 1. go home posision
+        agent.movej(home_pos, rel=False)
 
-    agent.movej(home_pos, rel=False)
+        center_coordinate_list, img = agent.vision_controller.get_object_center_coordnates()
 
+        if len(center_coordinate_list) == 0:
+            continue
+
+        target_object_x, target_object_y = center_coordinate_list[0]
+        print('objects coord', (target_object_x, target_object_y))
+        if target_object_x >250:
+            continue
+
+
+        # 2. detection object and get distance
+        xyz = [-90, 90, -3]
+        xyz += [0, 0, 0] # for rx,ry,rz
+        # 3. go to the object
+        agent.movel(xyz)
+        z_offset = 100
+        agent.movel([0, 0,-z_offset , 0, 0, 0])
+        # 4. grasp
+        agent.close_gripper()
+        # 5. go to place position
+        agent.movel([0, 0, +z_offset, 0, 0, 0])
+        agent.movej(place_pos, rel=False)
+        # 6. go to empty place
+        agent.movel([0, 0, -100, 0, 0, 0])
+        # 7. release the gripper
+        agent.open_gripper()
+        # 8. back to the place position
+        agent.movej(place_pos, rel=False)
+
+        agent.movej(home_pos, rel=False)
 
 
 def main_jokim(agent):
@@ -53,6 +69,7 @@ def main_jokim(agent):
     Speak_Secnario('5_2')
 
     # 예 아니요 마이크 입력
+
     Record_Audio.start(INPUT_AUDIO)
     stt = Speech_Recognition.stt(INPUT_AUDIO)
 
@@ -87,7 +104,9 @@ if __name__ == '__main__':
                 reload(Record_Audio)
                 reload(Speech_Recognition)
                 main_jokim(agent)
-            if test_case == 'quit':
+            if test_case == 'quit' or test_case == 'q':
                 break
     except Exception as e:
         print(e)
+    finally:
+        agent.belt_off()
