@@ -471,9 +471,9 @@
     ],
     "categories": [
         {
-            "supercategory": "Blue",
+            "supercategory": "Blue_Bottle",
             "id": 0,
-            "name": "Blue"
+            "name": "Blue_Bottle"
         },
         {
             "supercategory": "Chocolate",
@@ -486,9 +486,9 @@
             "name": "Clock"
         },
         {
-            "supercategory": "Color",
+            "supercategory": "Color_Nail",
             "id": 3,
-            "name": "Color"
+            "name": "Color_Nail"
         },
         {
             "supercategory": "Fish",
@@ -496,9 +496,9 @@
             "name": "Fish"
         },
         {
-            "supercategory": "Pink",
+            "supercategory": "Pink_Bottle",
             "id": 5,
-            "name": "Pink"
+            "name": "Pink_Bottle"
         },
         {
             "supercategory": "Remover",
@@ -506,19 +506,19 @@
             "name": "Remover"
         },
         {
-            "supercategory": "Round",
+            "supercategory": "Round_Bread",
             "id": 7,
-            "name": "Round"
+            "name": "Round_Bread"
         },
         {
-            "supercategory": "Square",
+            "supercategory": "Square_Bread",
             "id": 8,
-            "name": "Square"
+            "name": "Square_Bread"
         },
         {
-            "supercategory": "Sweet",
+            "supercategory": "Sweet_Potato",
             "id": 9,
-            "name": "Sweet"
+            "name": "Sweet_Potato"
         },
         {
             "supercategory": "Tomato",
@@ -531,9 +531,9 @@
             "name": "Toothpaste"
         },
         {
-            "supercategory": "Wet",
+            "supercategory": "Wet_Tissue",
             "id": 12,
-            "name": "Wet"
+            "name": "Wet_Tissue"
         }
     ],
     "annotations": [
