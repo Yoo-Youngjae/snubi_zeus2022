@@ -12,6 +12,7 @@ from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.engine import DefaultTrainer
 from detectron2.config import get_cfg
 import os
+import math
 
 cfg = get_cfg()
 cfg.merge_from_file("./detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
@@ -33,7 +34,7 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5   # set the testing threshold for th
 cfg.DATASETS.TEST = ("zeus_snu", )
 predictor = DefaultPredictor(cfg)
 
-i = 20
+i = 10
 index = 0
 arr = []
 while i >0:
@@ -54,14 +55,47 @@ while True:
     v = Visualizer(image[:, :, ::-1], MetadataCatalog.get(cfg.DATASETS.TRAIN[0]), scale=1.2)
     v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
     bboxes = outputs["instances"].to("cpu").pred_boxes.tensor.numpy()
+    masks = outputs["instances"].to("cpu").pred_masks.numpy()
     img = v.get_image()[:, :, ::-1]
+    img = cv2.resize(img, dsize=(1280, 720), interpolation=cv2.INTER_CUBIC)
+    show_custom = True
 
     center_coordinate_list = []
-    for bbox in bboxes:
+    dist_scale = 3
+    for bbox, mask in zip(bboxes, masks):
+        # get center coordinate
         x0, y0, x1, y1 = bbox
         center_x, center_y = int(x0 + x1) //2, int(y0 + y1) //2
-        center_coordinate_list.append((center_x, center_y))
-    print(center_coordinate_list)
+        # get min width angle
+        min_width = 1000
+        min_width_angle = 0
+        for i in range(18):
+            cnt = 0
+            for j in range(50):
+                x = int(center_x + math.cos(math.pi / 18 * i) * j * dist_scale)
+                y = int(center_y + math.sin(math.pi / 18 * i) * j * dist_scale)
+                x_180 = int(center_x + math.cos(math.pi + math.pi / 18 * i) * j * dist_scale)
+                y_180 = int(center_y + math.sin(math.pi + math.pi / 18 * i) * j * dist_scale)
 
-    cv2.imshow('Detectron2', img)
+                x = min(x, 1279)
+                x_180 = min(x_180, 1279)
+                y = min(y, 719)
+                y_180 = min(y_180, 719)
+                if mask[y][x] or mask[y_180][x_180]:
+                    cnt += 1
+                else:
+                    break
+            if min_width > cnt:
+                min_width = cnt
+                min_width_angle = i * 10
+        if show_custom:
+            min_angle_x_s = int(center_x + math.cos(math.pi + math.pi / 1.8 * min_width_angle) * min_width * dist_scale)
+            min_angle_y_s = int(center_y + math.sin(math.pi + math.pi / 1.8 * min_width_angle) * min_width * dist_scale)
+            min_angle_x_e = int(center_x + math.cos(math.pi / 1.8 * min_width_angle) * min_width * dist_scale)
+            min_angle_y_e = int(center_y + math.sin(math.pi / 1.8 * min_width_angle) * min_width * dist_scale)
+            img = cv2.line(img, (min_angle_x_s, min_angle_y_s), (min_angle_x_e, min_angle_y_e), (0, 255, 0), thickness=5)
+            img = cv2.circle(img, (center_x, center_y), 10, (0, 0, 255), -1)
+        center_coordinate_list.append((center_x, center_y, min_width_angle))
+    print(center_coordinate_list)
+    cv2.imshow('Custom image', img)
     key = cv2.waitKey(1)

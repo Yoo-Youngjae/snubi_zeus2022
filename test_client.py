@@ -56,21 +56,16 @@ if __name__ == '__main__':
             elif test_case == 'pick':
                 agent.movej(home_pos)
                 agent.movel([-90, 90, 0, 0, 0, 0])
-                agent.movel([0, 0, -103, 0, 0, 0])
+                agent.movel([0, 0, -100, 0, 0, 0])
                 agent.close_gripper()
                 agent.movej(home_pos)
                 agent.open_gripper()
-            elif test_case == 'place':
-                agent.movej(home_pos)
-                agent.movel([0, 0, 200, 0, 0, 0])
-                agent.movej(place_pos)
-                agent.open_gripper()
-                agent.movej(place_pos)
+
             elif test_case == 'pp':
                 agent.movej(home_pos)
                 agent.open_gripper()
                 agent.movel([-90, 90, 0, 0, 0, 0])
-                agent.movel([0, 0, -103, 0, 0, 0])
+                agent.movel([0, 0, -100, 0, 0, 0])
                 agent.close_gripper()
                 agent.movej(home_pos)
                 agent.movel([0, 0, 260, 0, 0, 0])
@@ -105,6 +100,30 @@ if __name__ == '__main__':
                 if ser.readable():
                     ser.write('0'.encode('utf-8'))
                     time.sleep(0.5)
+            elif test_case == 'movej_1+':
+                agent.movej([30, 0, 0, 0, 0, 0], rel=True)
+            elif test_case == 'movej_1-':
+                agent.movej([-30, 0, 0, 0, 0, 0], rel=True)
+            elif test_case == 'movej_2+':
+                agent.movej([0, 30, 0, 0, 0, 0], rel=True)
+            elif test_case == 'movej_2-':
+                agent.movej([0, -30, 0, 0, 0, 0], rel=True)
+            elif test_case == 'movej_3+':
+                agent.movej([0, 0, 30, 0, 0, 0], rel=True)
+            elif test_case == 'movej_3-':
+                agent.movej([0, 0, -30, 0, 0, 0], rel=True)
+            elif test_case == 'movej_4+':
+                agent.movej([0, 0, 0, 30, 0, 0], rel=True)
+            elif test_case == 'movej_4-':
+                agent.movej([0, 0, 0, -30, 0, 0], rel=True)
+            elif test_case == 'movej_5+':
+                agent.movej([0, 0, 0, 0, 30, 0], rel=True)
+            elif test_case == 'movej_5-':
+                agent.movej([0, 0, 0, 0, -30, 0], rel=True)
+            elif test_case == 'movej_6+':
+                agent.movej([0, 0, 0, 0, 0, 30], rel=True)
+            elif test_case == 'movej_6-':
+                agent.movej([0, 0, 0, 0, 0, -30], rel=True)
             elif test_case == 'q':
                 break
             else:

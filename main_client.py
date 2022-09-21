@@ -19,27 +19,30 @@ basket_pos2 = [47, 33, 152, -102, -127, 116]
 # basket_pos2 = [19, 27, 127, -103, -139, 155]
 
 def main_yjyoo(agent):
-    print("Start shopping")
+    print("1. Start shopping")
     agent.belt_on()
+    agent.open_gripper()
     start_time = time.time()
-    while time.time() - start_time <=60:
+    while time.time() - start_time <= 180:
         # 1. go home posision
         agent.movej(home_pos, rel=False)
-
-        center_coordinate_list, img = agent.vision_controller.get_object_center_coordnates()
-
+        center_coordinate_list = agent.get_object_coordnates_by_vision_agent()
         if len(center_coordinate_list) == 0:
             continue
 
-        target_object_x, target_object_y = center_coordinate_list[0]
-        print('objects coord', (target_object_x, target_object_y))
+        target_object_x, target_object_y = center_coordinate_list[0], center_coordinate_list[1]
+        object_angle = center_coordinate_list[2]
         if target_object_x >250:
             continue
+        print('1. objects coord', (target_object_x, target_object_y), object_angle)
+        y_offset = int((target_object_y - 350) // 15 * 10)
+        gripper_angle = 90 - object_angle
 
 
         # 2. detection object and get distance
-        xyz = [-90, 90, -3]
-        xyz += [0, 0, 0] # for rx,ry,rz
+        print('2. y_offset, gripper_angle', y_offset, gripper_angle)
+        xyz = [-135, 90 + y_offset, 0]
+        xyz += [0, 0, gripper_angle] # for rx,ry,rz
         # 3. go to the object
         agent.movel(xyz)
         z_offset = 100
