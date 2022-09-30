@@ -13,13 +13,8 @@ def cos_sim(A, B):
     return [dot(i, B)/(norm(i)*norm(B)) for i in A]
 
 
-def MSE(A, B):
-    return [np.square(np.subtract(i, B)).mean() for i in A]
-    # return np.square(np.subtract(A, B)).mean()
-
-
 def improved_sqrt_cos_sim(A, B):
-    return [dot(i, B)/(np.sqrt(norm(i, ord=1))*np.sqrt(norm(B, ord=1))) for i in A]
+    return [dot(np.sqrt(i+0.0001), np.sqrt(B+0.0001))/(np.sqrt(norm(i, ord=1))*np.sqrt(norm(B, ord=1))) for i in A]
 
 
 def dot_sim(A, B):
@@ -56,7 +51,7 @@ def get_key(p_vec, q_vec):
     return str(hashlib.sha1(p_vec)) + str(hashlib.sha1(q_vec))
 
 
-def fractional_distance(p_vec, q_vec, fraction=2.0):
+def fractional_dis(p_vec, q_vec, fraction=2):
     """
     This method implements the fractional distance metric. I have implemented memoization for this method to reduce
     the number of function calls required. The net effect is that the algorithm runs 400% faster. A similar approach
@@ -70,6 +65,12 @@ def fractional_distance(p_vec, q_vec, fraction=2.0):
     e = 0.001
     # memoization is used to reduce unnecessary calculations ... makes a BIG difference
     memoize = True
+
+    if torch.is_tensor(p_vec):
+        p_vec = p_vec.numpy()
+
+    if torch.is_tensor(q_vec):
+        q_vec = q_vec.numpy()
 
     sim_np = []
     for i in p_vec:
@@ -88,6 +89,42 @@ def fractional_distance(p_vec, q_vec, fraction=2.0):
             sim_np.append(max(pow(np.sum(diff_fraction), 1/fraction), e))
 
     return sim_np
+
+
+def similarity_calculation(metric, full_database_features, object):
+    if metric == "all":
+        return [cos_sim(full_database_features, object),
+                improved_sqrt_cos_sim(full_database_features, object),
+                dot_sim(full_database_features, object),
+                euclidean_dis(full_database_features, object),
+                manhattan_dis(full_database_features, object),
+                minkowski_dis(full_database_features, object, 10),
+                fractional_dis(full_database_features, object)]
+    elif metric == "cos_sim":
+        return cos_sim(full_database_features, object)
+    elif metric == "improved_sqrt_cos_sim":
+        return improved_sqrt_cos_sim(full_database_features, object)
+    elif metric == "dot_sim":
+        return dot_sim(full_database_features, object)
+    elif metric == "euclidean_dis":
+        return euclidean_dis(full_database_features, object)
+    elif metric == "manhattan_dis":
+        return manhattan_dis(full_database_features, object)
+    elif metric == "minkowski_dis":
+        return minkowski_dis(full_database_features, object)
+    elif metric == "fractional_dis":
+        return fractional_dis(full_database_features, object)
+
+
+def poll(sim_np, m='max', top_k=3):
+    k = top_k
+    sim_list = list(sim_np)
+    if m == 'max':
+        temp = sorted(sim_list, reverse=True)[:k]
+    else:
+        temp = sorted(sim_list, reverse=False)[:k]
+
+    return [sim_list.index(temp[i]) for i in range(top_k)]
 
 
 def is_top_k(database_df, test_product_id, sim_np, m='max', top_k=3):
@@ -112,7 +149,7 @@ def is_top_k(database_df, test_product_id, sim_np, m='max', top_k=3):
             return 0
 
 
-def print_top_k_values(database_df, test_item_id, sim_np, m='max', top_k=3):
+def print_top_k_values(database_df, test_product_id, sim_np, m='max', top_k=3):
     sim_list = list(sim_np)
     if m == 'max':
         temp = sorted(sim_list, reverse=True)[:top_k]
@@ -120,7 +157,7 @@ def print_top_k_values(database_df, test_item_id, sim_np, m='max', top_k=3):
         for m in temp:
             list_max.append([sim_list.index(m), m])
 
-        print(f"[{test_item_id == database_df['product_id'][list_max[0][0]]}][test_product_id: {test_item_id}] and pred[product_id, sim] => "
+        print(f"[{test_product_id == database_df['product_id'][list_max[0][0]]}][test_product_id: {test_product_id}] and pred[product_id, sim] => "
               f"max=[{database_df['product_id'][list_max[0][0]]}, {list_max[0][1]}], "
               f"max-1=[{database_df['product_id'][list_max[1][0]]}, {list_max[1][1]}], "
               f"max-2=[{database_df['product_id'][list_max[2][0]]}, {list_max[2][1]}], "
@@ -133,13 +170,28 @@ def print_top_k_values(database_df, test_item_id, sim_np, m='max', top_k=3):
             list_min.append([sim_list.index(m), m])
 
         print(
-            f"{test_item_id == database_df['product_id'][list_min[0][0]]}][test_product_id: {test_item_id}] and pred[product_id, sim] => "
+            f"{test_product_id == database_df['product_id'][list_min[0][0]]}][test_product_id: {test_product_id}] and pred[product_id, sim] => "
             f"min=[{database_df['product_id'][list_min[0][0]]}, {list_min[0][1]}], "
             f"min-1=[{database_df['product_id'][list_min[1][0]]}, {list_min[1][1]}], "
             f"min-2=[{database_df['product_id'][list_min[2][0]]}, {list_min[2][1]}], "
             f"mean_dis_sim: {np.mean(sim_list)}, var_dis_sim: {np.var(sim_list)}")
 
+
 def print_top_k_metric_result(top_k_accuracy):
     print('<Top 1 Accuracy | Top 3 Accuracy>')
-    print(f'{np.average(top_k_accuracy[0])} | {np.average(top_k_accuracy[1])}>'.center(20))
+    print(f'{np.average(top_k_accuracy[0])} | {np.average(top_k_accuracy[1])}')
+
+
+def print_all_top_k_metric_result(all_top_k_accuracy):
+    similarity_name_list = ['cos_sim',
+     'improved_sqrt_cos_sim',
+     'dot_sim',
+     'euclidean_dis',
+     'manhattan_dis',
+     'minkowski_dis',
+     'fractional_dis']
+
+    print('<Top 1 Accuracy | Top 3 Accuracy>')
+    for idx, top_k_accuracy in enumerate(all_top_k_accuracy):
+        print(f"{similarity_name_list[idx]}: {np.average(top_k_accuracy[0])} | {np.average(top_k_accuracy[1])}")
 

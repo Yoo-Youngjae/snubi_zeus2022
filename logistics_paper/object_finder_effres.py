@@ -34,6 +34,8 @@ def filter():
                     ], p=1.)
 
 
+
+
 import time
 def preprprocess_image(image_name):
     # 1. Load the image with Pillow library
@@ -48,24 +50,6 @@ def preprprocess_image(image_name):
     im2 = background
 
     im2.save(image_name)
-
-
-#
-# def HSVColor(img):
-#     if isinstance(img, Image.Image):
-#         r, g, b = img.split()
-#     Hdat = []
-#     Sdat = []
-#     Vdat = []
-#     for rd, gn, bl in zip(r.getdata(), g.getdata(), b.getdata()):
-#         h, s, v = colorsys.rgb_to_hsv(rd / 255., gn / 255., bl / 255.)
-#     Hdat.append(int(h * 255.))
-#     Sdat.append(int(s * 255.))
-#     Vdat.append(int(v * 255.))
-#     r.putdata(Hdat)
-#     g.putdata(Sdat)
-#     b.putdata(Vdat)
-#     return Image.merge('RGB', (r, g, b))
 
 
 def get_vector(arg, image_name, im2=None, tensor=False):
@@ -89,44 +73,49 @@ def get_vector(arg, image_name, im2=None, tensor=False):
         background.paste(im2, offset)
         im2 = background.convert('RGB')
 
-        #im2 = im2.convert('HSV')
-        #im2 = HSVColor(im2)
-        #im2.show()
-        #im2.save(image_name)
-        # 2. Create a PyTorch Variable with the transformed image
-    # im2.show()
-
-
     t_img = Variable(normalize(to_tensor(scaler(im2))).unsqueeze(0))
-
-    ###########################################
-    #transform = filter()
-    #t_img = transform(image=np.array(im2))['image'].unsqueeze(0)
-    ###########################################
     t_img = t_img.to(device)
-
 
     # 3. Create a vector of zeros that will hold our feature vector
     #    The 'avgpool' layer has an output size of 512
-    my_embedding = torch.zeros(arg["model_size"])
-    #my_embedding2 = torch.zeros(arg["model_size2"])
-
     # 4. Define a function that will copy the output of a layer
-    def copy_data(m, i, o):
-        my_embedding.copy_(o.data.reshape(o.data.size(1)))
-    # 5. Attach that function to our selected layer
-    h = layer.register_forward_hook(copy_data)
-    #h2 = layer.
 
-    # 6. Run the model on our transformed image
-    model(t_img)
-    #model2(t_img)
-    # 7. Detach our copy function from the layer
-    h.remove()
-    #h2.remove()
-    # 8. Return the feature vector
+    #resnet, vgg, effnet, res + eff
+    if arg["model"] == "resnet":
+        my_embedding = torch.zeros(model_size)
+        def copy_data(m, i, o):
+            my_embedding.copy_(o.data.reshape(o.data.size(1)))
+        h = layer.register_forward_hook(copy_data)
+        model(t_img)
+        h.remove()
+    elif arg["model"] == "effnet":
+        my_embedding = torch.zeros(model_size)
+        def copy_data(m, i, o):
+            my_embedding.copy_(o.data.reshape(o.data.size(1)))
+        h = layer.register_forward_hook(copy_data)
+        model(t_img)
+        h.remove()
+    elif arg["model"] == "res+eff":
+        my_embedding1 = torch.zeros(model_size)
+        my_embedding2 = torch.zeros(model2_size)
+        def copy_data(m, i, o):
+            my_embedding1.copy_(o.data.reshape(o.data.size(1)))
+        def copy_data2(m, i, o):
+            my_embedding2.copy_(o.data.reshape(o.data.size(1)))
+        h = layer.register_forward_hook(copy_data)
+        h2 = layer2.register_forward_hook(copy_data2)
+        model(t_img)
+        model2(t_img)
+        h.remove()
+        h2.remove()
+        if tensor:
+            my_embedding = torch.cat((my_embedding1, my_embedding2), dim=0)
+        else:
+            my_embedding = np.concatenate((my_embedding1, my_embedding2), axis=0)
+
     if tensor:
         return my_embedding
+
     return my_embedding.numpy()
 
 def get_all_database_tensor(df):
@@ -195,7 +184,7 @@ def get_test_image(arg, idx):
             im2 = background.convert('RGB')
 
             im_list.append(im2)
-            object_vector_list.append(get_vector(arg, None, im2=im2))
+            object_vector_list.append(get_vector(arg, None, im2=im2,tensor=True))
 
     return object_vector_list, im_list
 
@@ -228,22 +217,6 @@ def save_result(arg, arg_save_dir, test_idx, inference_idxes, obj_img):
     img = Image.fromarray(images)
     img.save(arg_save_dir+str(test_idx)+'.png')
 
-# def save_result(test_idx, inference_idx, obj_img):
-#     test_img = Image.open('test_image_800/'+str(test_idx)+'.png')
-#     test_img = test_img.resize((360, 640))
-#     test_img = np.asarray(test_img)
-#
-#     obj_img = obj_img.resize((360, 640))
-#     obj_img = np.asarray(obj_img)
-#
-#     infer_img = Image.open('image/' + str(inference_idx) + '.jpg')
-#     infer_img = infer_img.resize((360, 640))
-#     infer_img = np.asarray(infer_img)
-#
-#     images = np.hstack((test_img, obj_img))
-#     images = np.hstack((images, infer_img))
-#     img = Image.fromarray(images)
-#     img.save('result_800_filtered/'+str(test_idx)+'.png')
 
 scaler = transforms.Resize((320, 320))
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -323,28 +296,40 @@ def start(arg):
 if __name__ == "__main__":
     device = torch.device('cuda')
 
-    eff_model_size = 1792
-    # resnet_model_size = 2048
-
-    # feature extract model
-    model = models.efficientnet_b4(pretrained=True)
-    #model = models.resnet50(pretrained=True)
-
-    model.to(device)
-    layer = model._modules.get('avgpool')
-    model.eval()
-
     arg = {"test_label_df": "test_label_final",
-           "full_database_features": "full_database_features",
+           "full_database_features": "full_database_features_ResEff",
            "test_len": 104,
            "similarity_metric": "fractional_dis",
            "min_max": "min",
            "similarity_metric_compare_all": True,
-           "test_image_dir": "test_image/test_image_white_bg/",
-           "result_dir": "result/result_white_bg_effnet/",
+           "test_image_dir": "test_image/test_image_black_bg_rough/",
+           "result_dir": "result/result_black_bg_rough_ResEffnet/",
            "save_result": True,
-           "model_size": eff_model_size
+           "model": "res+eff" #resnet, effnet, res+eff
            }
 
-    start(arg)
+    #resnet, vgg, effnet, res + eff, res + vgg
+    if arg["model"] == "resnet":
+        model_size = 2048
+        model = models.resnet50(pretrained=True)
+        model.to(device)
+        layer = model._modules.get('avgpool')
+        model.eval()
+    elif arg["model"] == "effnet":
+        model_size = 1792
+        model = models.efficientnet_b4(pretrained=True)
+        model.to(device)
+        layer = model._modules.get('avgpool')
+        model.eval()
+    elif arg["model"] == "res+eff":
+        model_size = 2048
+        model2_size = 1792
+        model = models.resnet50(pretrained=True)
+        model2 = models.efficientnet_b4(pretrained=True)
+        model.to(device)
+        model2.to(device)
+        layer = model._modules.get('avgpool')
+        layer2 = model2._modules.get('avgpool')
+        model2.eval()
 
+    start(arg)
