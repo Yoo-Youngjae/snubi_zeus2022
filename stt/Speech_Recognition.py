@@ -1,8 +1,52 @@
-import json
 import requests
+import torch
+from omegaconf import OmegaConf
+from stt.silero_models.src.silero.utils import (init_jit_model,
+                       split_into_batches,
+                       read_audio,
+                       read_batch,
+                       prepare_model_input)
+import numpy as np
+import sounddevice as sd
+from beepy import beep
 
+class STTController:
+    def __init__(self):
+        self.device = torch.device('cpu')  # gpu also works, but our models are fast enough for CPU
+        models = OmegaConf.load('/home/snubi/PycharmProjects/snubi_zeus2022/stt/silero_models/models.yml')
+        self.model, self.decoder = init_jit_model(models.stt_models.en.v3.jit, device=self.device)
+    def stt(self, SEC=3, FS = 16000):
 
-def stt(audio_file):
+        pos_list = ['n', 'net', 'that', 'yeah']
+        neg_list = ['and', 'anyour', 'anio', 'an your', 'honey',
+                    'annewyork', 'anual', 'annne', 'i your', 'an',
+                    'andne', 'a u', 'annual', 'annneual', 'your', 'no',
+                    'and you', 'nineion', 'when you', 'a no', 'hor',
+                    'anu', 'hano', 'ano', 'ananyion', 'ninee', 'ahnoor',
+                    'hio', 'a your', 'hanor', 'hanio', 'anl', 'hanne',
+                    'h your', 'anne', 'anuor', 'anor', 'anion', 'an u',
+                    'anon', 'andyour', 'hneor', 'anneor', 'mano', 'aneo',
+                    'a you', 'annu', 'nineu', 'on your', 'and your', 'a new',
+                    'a knew', 'are knew', 'anewor', 'h knew', 'on you',
+                    'and no', 'oh you']
+        beep('coin')
+        record = sd.rec(FS * SEC, samplerate=FS, channels=1)
+        sd.wait()
+        record = record * np.iinfo(np.int16).max
+        record = record.astype(np.int16).flatten()
+        signal = torch.from_numpy(record).to(torch.float32).to(self.device)
+        signal = signal.unsqueeze(0)
+        output = self.model(signal)
+        result = ""
+        for example in output:
+            result += self.decoder(example.cpu())
+        print('[STT]', result)
+        if result not in neg_list:
+            return 'yes'
+        else:
+            return 'no'
+
+def stt_naver(audio_file):
     Lang = "Kor" # Kor / Jpn / Chn / Eng
     URL = "https://naveropenapi.apigw.ntruss.com/recog/v1/stt?lang=" + Lang
         
@@ -28,5 +72,12 @@ def stt(audio_file):
     #     print("Error : " + response.text)
 
     data.close()
+    res = response.json()['text']
 
-    return response.json() #json 파일로 전달
+    pos_list = ["예", "네", "그래", "응", "해줘", "진행해줘"]
+    neg_list = ["아니", "아니요", "아니오", "아닌데", "아니야"]
+    if res not in neg_list:
+        print('[positive]', res)
+        return 'yes'
+    print('[negative]', res)
+    return 'no'

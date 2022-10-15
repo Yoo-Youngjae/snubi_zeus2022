@@ -1,21 +1,20 @@
 from playsound import playsound
 
-def Speak_Secnario(num):
+def speak_secnario(num):
     if num == '1':
-        playsound("stt/tts_audio/안녕하세요+준오님_+BI+마트에+오신걸+환영합니다_+저는+결제를+도와드릴+누비입니다_.mp3")
+        playsound("stt/tts_audio/1.mp3") #01_안녕하세요_스누비마트에_오신_것을_환영합니다____저는_스누비마트의_마스코트_누비입
+    elif num == '2':
+        playsound("stt/tts_audio/2.mp3") #02_벨트_위에_물건을_차례차례_올려주세요
+    elif num == '3':
+        playsound("stt/tts_audio/3.mp3") #03_깨지기_쉬운_계란은_나중에_넣을게요.mp3
     elif num == '4':
-        playsound("stt/tts_audio/셀프+계산대에+상품을+올려놓으시면%2C+결제를+도와드리겠습니다_+.mp3")
-    elif num == '5_2':
-        playsound("stt/tts_audio/계산+목록을+확인해주시면+결제를+진행해드리겠습니다_.mp3")
-        playsound("stt/tts_audio/결제를+진행하시겠습니까_.mp3")
-    elif num == '5_3':
-        playsound("stt/tts_audio/계산+및+포인트+적립이+완료+되었습니다_.mp3")
+        playsound("stt/tts_audio/4.mp3") #04_더_이상_구매하실_물건이_없나요_
+    elif num == '5':
+        playsound("stt/tts_audio/5.mp3") #05_오늘_구매하시는_물건의_총액은_다음과_같네요_미리_등록해두신_결제_정보로_결제를_진행해
     elif num == '6':
-        playsound("stt/tts_audio/장바구니+챙겨+가시기+바랍니다_+.mp3")
-        playsound("stt/tts_audio/좋은+하루+되세요!.mp3")
-    elif num == '5_2_n':
-        playsound("stt/tts_audio/장바구니에서+상품을+다시+한번+확인해주시기+바랍니다_.mp3")
-
+        playsound("stt/tts_audio/6.mp3") #07_계산이_모두_완료되었습니다_장바구니를_받아주세요
+    elif num == '7':
+        playsound("stt/tts_audio/7.mp3") #08_오늘도_스누비마트를_이용해주셔서_감사합니다_행복한_하루_보내세요
 
 
 

@@ -3,7 +3,7 @@
 from robot.Agent import Agent
 
 # add jokim
-from stt import Speech_Recognition, Record_Audio
+from stt import Speech_Recognition
 from stt.Text_to_Speech import speak_secnario
 from importlib import reload
 import time

@@ -35,7 +35,7 @@ class DetectronController:
         # get center coord of each objects
         center_coordinate_list = []
         dist_scale = 3
-        for bbox, mask in zip(bboxes, masks):
+        for bbox, mask, obj_class in zip(bboxes, masks, outputs["instances"].to("cpu").pred_classes.numpy()):
             # get center coordinate
             x0, y0, x1, y1 = bbox
             center_x, center_y = int(x0 + x1) // 2, int(y0 + y1) // 2
@@ -83,6 +83,6 @@ class DetectronController:
                 min_angle_y_e = int(center_y + math.sin(math.pi / 180 * min_width_angle) * min_width * dist_scale)
                 img = cv2.line(img, (min_angle_x_s, min_angle_y_s), (min_angle_x_e, min_angle_y_e), (0, 255, 0), thickness=5)
                 img = cv2.circle(img, (center_x, center_y), 10, (0, 0, 255), -1)
-            center_coordinate_list.append((center_x, center_y, min_width_angle))
-
-        return sorted(center_coordinate_list, key=lambda tup: tup[0]), img
+            center_coordinate_list.append((center_x, center_y, min_width_angle, obj_class))
+        object_label_np = outputs["instances"].to("cpu").pred_classes.numpy()
+        return sorted(center_coordinate_list, key=lambda tup: tup[0]), img, list(object_label_np)
