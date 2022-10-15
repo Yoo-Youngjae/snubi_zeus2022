@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators import gzip
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, JsonResponse, HttpResponse
 import cv2
 import threading
+from django.template import loader
 from playsound import playsound
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -15,9 +16,8 @@ import rospy
 
 import mediapipe as mp
 
-
-
-product_name = ['Blue_Bottle', 'Chocolate', 'Clock', 'Color_Nail', 'Fish', 'Pink_Bottle', 'Remover', 'Round_Bread', 'Square_Bread', 'Sweet_Potato', 'Tomato', 'Toothpaste', 'Wet_Tissue']
+product_name = ['JellO', 'Doraemon', 'Egg', 'ChocolateMilk', 'GardeningSet', 'Tomato', 'Carrot', 'Fish', 'AlmondMilk',
+                'AppleJuice', 'WetTissue', 'Tea', 'Clock', 'StrawberryMilk','SweetPotato', 'Sponge', 'SquareBread', 'RoundBread', 'Soap']
 product_price = [3000, 1000, 3500, 1500, 4000, 3000, 2000, 3200, 3800, 4500, 4800, 2000, 2000]
 
 total_price = 0
@@ -29,18 +29,10 @@ signal = False
 
 def main(request):
     global page
-    global signal
-
     if request.method == 'POST': # 지금은 버튼 이벤트로 1을 받아오도록 구현
         page = int(request.POST.get("move_page"))
         print(page)
-        ######## YES를 대답해서 page 값 1을 받아오면 ########
-        # TTS) 벨트 위에 물건을 차례차례 올려주세요.
-        # 컨베이어 벨트 작동
-
-    if signal == True:
-        page = subscribe_tester.page
-        signal = False
+        #page = subscribe_tester.page
         return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
     # page = 0: facedetection 페이지 (default)
     # page = 1: Welcome 페이지
@@ -109,7 +101,7 @@ class DetectronVideoCamera(object):
 class FaceVideoCamera(object):
 
     def __init__(self):
-        self.video = cv2.VideoCapture(2)
+        self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         self.mpDraw = mp.solutions.drawing_utils
         self.mpFaceMesh = mp.solutions.face_mesh
@@ -140,19 +132,6 @@ class FaceVideoCamera(object):
 
             #cv2.imshow("Image", img)
             #cv2.waitKey(1)
-
-
-def detectron_gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-def face_gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 def gen(camera):
     while True:

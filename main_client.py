@@ -3,14 +3,13 @@
 from robot.Agent import Agent
 
 # add jokim
-from stt import SpeechRecognition
 from stt.TextToSpeech import speak_secnario
-from importlib import reload
 import time
 from robot_global_variable import *
+import threading
 
 
-def main_yjyoo(agent):
+def main_pick_and_place(agent):
     agent.belt_on()
     agent.open_gripper()
     start_time = time.time()
@@ -42,28 +41,27 @@ def main_yjyoo(agent):
         target_object_x, target_object_y = center_coordinate_list[0], center_coordinate_list[1]
         object_angle, object_class = center_coordinate_list[2], center_coordinate_list[3]
 
-        if target_object_x >250:
+        if target_object_x < 950:
             continue
         print('1) objects coord', (target_object_x, target_object_y), object_angle)
-        y_offset = int((target_object_y - 350) // 15 * 10)
+        y_offset = int((400 - target_object_y) // 15 * 10) + 100
         gripper_angle = 90 - object_angle
-
 
         # 2. detection object and get distance
         print('2) y_offset, gripper_angle', y_offset, gripper_angle)
-        xyz = [-135, 90 + y_offset, 0]
+        xyz = [-135, y_offset, 0]
         xyz += [0, 0, gripper_angle] # for rx,ry,rz
         # 3. go to the object
         agent.movel(xyz)
-        z_offset = 100
-        agent.movel([0, 0,-z_offset , 0, 0, 0])
+        z_offset = 95
+        agent.movel([0, 0, -z_offset, 0, 0, 0])
         # 4. grasp
         agent.close_gripper()
         # 5. go to place position
         agent.movej(HOME_POS)
-        agent.movel([0, 0, 260, 0, 0, 0])
 
         if int(object_class) == EGG_CLASS_NUM:
+            agent.movel([0, 0, 260, 0, 0, 0])
             speak_secnario('3')
             exist_egg = True
             agent.movej(EGG_POS, rel=False)
@@ -71,6 +69,13 @@ def main_yjyoo(agent):
             agent.open_gripper()
             agent.movel([0, 0, 100, 0, 0, 0])
             continue
+        if int(object_class) == MILK_CLASS_NUM:
+            # speak_secnario('3') # todo : add milk tts
+            agent.movej(HOME_POS)
+            pass_though(agent)
+            continue
+
+        agent.movel([0, 0, 260, 0, 0, 0])
         agent.movej(PLACE_POS, rel=False)
         # 6. go to empty place
         agent.movel([60, 0, -350, 0, 0, 0])
@@ -80,6 +85,22 @@ def main_yjyoo(agent):
         agent.movej(PLACE_POS, rel=False)
 
         agent.movej(HOME_POS, rel=False)
+
+
+def pass_though(agent):
+    pass_though1 = [68, 0, -180, 0, 110, 0]
+    pass_though2 = [28, 0, -235, 0, 50, 0]
+    pass_though3 = [38, 0, -180, 0, -110, 0]
+
+
+    agent.movej(pass_though1)
+    agent.movej(pass_though2)
+    agent.open_gripper()
+    time.sleep(2)
+    agent.close_gripper()
+    agent.movej(pass_though3)
+    agent.movej(HOME_POS)
+    agent.open_gripper()
 
 def place_motion(agent):
     basket_temp = [0, 0, 140, 5, -135, 75]
@@ -104,39 +125,45 @@ def place_motion(agent):
     agent.movej(basket_pos3)
     agent.open_gripper()
 
+def welcome_motion(agent):
+    welcome_pose1 = [55, -15, -97, 0, 109, 49]
+    welcome_pose2 = [47, -24, -110, 0, 79, 90]
+
+    agent.movej(HOME_POS)
+
+    agent.movej(welcome_pose1)
+    agent.movej([0, 0, 0, 0, 10, 0], rel=True)
+    agent.movej([0, 0, 0, 0, -20, 0], rel=True)
+    agent.movej([0, 0, 0, 0, 20, 0], rel=True)
+    agent.movej([0, 0, 0, 0, -10, 0], rel=True)
+
+    agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+    agent.movel([-150, 0, -150, 0, 0, 0], rel=True)
+    agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+
+    agent.movej(welcome_pose2)
+    agent.close_gripper()
+    agent.open_gripper()
+    agent.close_gripper()
+    agent.open_gripper()
+
 def main_jokim(agent):
     print("Start shopping")
 
     agent.movej(HOME_POS)
+    place_motion(agent)
 
-    speak_secnario('1')
-    # speak_secnario('4')
-    # speak_secnario('5_2')
-
-    # 예 아니요 마이크 입력
-    INPUT_AUDIO = "/home/snubi/PycharmProjects/snubi_zeus2022/stt/audio_data/input_audio.wav"
-    Record_Audio.start(INPUT_AUDIO)
-    stt = Speech_Recognition.stt(INPUT_AUDIO)
-
-    print("Result:", stt['text'])  # text 결과 출력
-
-    pos_list = ["예", "네", "그래", "응", "해줘", "진행해줘"]
-
-    #if stt['text'] in pos_list:
-    if "해줘" in pos_list:
-        # speak_secnario('5_3')
-        speak_secnario('6')
-
-        place_motion(agent)
-
-    else:
-        speak_secnario('7')
+    speak_secnario('7')
 
 def main_full(agent):
     while True:
         print('1. start. go to home pose')
         agent.movej(HOME_POS)
-        speak_secnario('1')
+        t = threading.Thread(target=speak_secnario, args=('1',))
+        t.start()
+
+        welcome_motion(agent)
+
         stt_res = agent.stt_controller.stt(SEC=3)
         if stt_res == 'yes':
             break
@@ -145,7 +172,7 @@ def main_full(agent):
         agent.ui_page_go(2)
         print('2. belt_on. calc start')
         speak_secnario('2')
-        main_yjyoo(agent)
+        main_pick_and_place(agent)
         print('3. end calc.')
         agent.belt_off()
         speak_secnario('4')
@@ -167,11 +194,11 @@ if __name__ == '__main__':
             test_case = input('what is your name : ')
             if test_case == 'full':
                 main_full(agent)
-            if test_case == 'yjyoo': # here is for yjyoo
-                main_yjyoo(agent)
+                agent.belt_off()
+            if test_case == 'pp': # here is for yjyoo
+                main_pick_and_place(agent)
+                agent.belt_off()
             elif test_case == 'jokim': # here is for jokim
-                reload(Record_Audio)
-                reload(Speech_Recognition)
                 main_jokim(agent)
             if test_case == 'quit' or test_case == 'q':
                 break

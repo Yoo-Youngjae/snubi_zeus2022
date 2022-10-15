@@ -15,8 +15,8 @@ class STTController:
         self.device = torch.device('cpu')  # gpu also works, but our models are fast enough for CPU
         models = OmegaConf.load('/home/snubi/PycharmProjects/snubi_zeus2022/stt/silero_models/models.yml')
         self.model, self.decoder = init_jit_model(models.stt_models.en.v3.jit, device=self.device)
-    def stt(self, SEC=3, FS = 16000):
 
+    def stt(self, SEC=3, FS = 16000):
         pos_list = ['n', 'net', 'that', 'yeah']
         neg_list = ['and', 'anyour', 'anio', 'an your', 'honey',
                     'annewyork', 'anual', 'annne', 'i your', 'an',
@@ -28,7 +28,7 @@ class STTController:
                     'anon', 'andyour', 'hneor', 'anneor', 'mano', 'aneo',
                     'a you', 'annu', 'nineu', 'on your', 'and your', 'a new',
                     'a knew', 'are knew', 'anewor', 'h knew', 'on you',
-                    'and no', 'oh you']
+                    'and no', 'oh you', 'anneo', 'i knew']
         beep('coin')
         record = sd.rec(FS * SEC, samplerate=FS, channels=1)
         sd.wait()

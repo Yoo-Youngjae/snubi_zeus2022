@@ -20,7 +20,10 @@
   </nav>
 </header>
 
+
+
 <!-- 2번 화면(detectron) -->
+<div id = "main">
 {% if page == 1 %}
 <div class="center">
   <img src="{% static 'main/img/0page.gif' %}"  width="1000px" height="550px"> <br>
@@ -122,8 +125,8 @@
   </form>
 </div>
 {% endif %}
-
 {% endblock %}
+</div>
 
 {% block script %}
 <script>
@@ -137,10 +140,16 @@
     $(document).fromId.submit();
 </script>
 <script>
-  function reloading(){
-    location.reload();
+  window.setTimeout(function () {
+    updateDiv()
+  }, 3000); // refresh/redirect after 5 seconds.
+</script>
+<script>
+  function updateDiv() {
+    $( "#main" ).load(window.location.href + " #main" );
   }
 </script>
+
 {% endblock %}
 
 

@@ -1,6 +1,6 @@
 {% load static %}
+{% load livereload_tags %}
 <html>
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,9 +25,9 @@
   {% block style %}
   {% endblock %}
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% livereload_script %}
+
 </head>
-{% load livereload_tags %}
-{% livereload_script %}
 
 <!--overflow-y: hidden-->
 <body style="overflow-x: hidden;"></body>
@@ -54,5 +54,4 @@
     {% block script %}
     {% endblock %}
 </body>
-  
 </html>

@@ -3,6 +3,9 @@
 from robot.Agent import Agent
 import serial
 import time
+from robot_global_variable import *
+from stt.TextToSpeech import speak_secnario
+import threading
 
 home_pos = [68, -9, -102, 0, -69, 69]
 # home_pos = [55, -5, -102, 0, -73, 56]
@@ -17,6 +20,13 @@ basket_pos1 = [25, 48, 139, -125, -124, 115]
 basket_pos2 = [91, -2, 127, -78, -94, 148]
 basket_pos3 = [164, -5, 92, -88, -58, 186]
 
+
+pass_though1 = [68, 0, -180, 0, 110, 0]
+pass_though2 = [23, 0, -235, 0, 50, 0]
+pass_though3 = [38, 0, -180, 0, -110, 0]
+
+
+# j1=38.0, j2=-9.0, j3=-220.0, j4=0.0, j5=30.0, j6=0.0
 #basket_pos1 = [96, -24, 149, -55, -106, 198] 간지
 #basket_pos2 = [37, 0, 90, 0, -90, 56]
 
@@ -30,6 +40,21 @@ if __name__ == '__main__':
                 agent.movej(home_pos)
             elif test_case == 'place':
                 agent.movej(place_pos)
+            elif test_case == 'egg':
+                agent.movej(EGG_POS)
+                agent.movel([0, 0, -80, 0, 0, 0])
+                agent.close_gripper()
+                agent.movel([0, 0, 80, 0, 0, 0])
+            elif test_case == 'pass_though_go':
+                agent.movej(pass_though1)
+                agent.movej(pass_though2)
+            elif test_case == 'pass_though_back':
+                agent.movej(pass_though3)
+                agent.movej(HOME_POS)
+            elif test_case == 'pass_though1':
+                agent.movej(pass_though1)
+            elif test_case == 'pass_though2':
+                agent.movej(pass_though2)
             elif test_case == 'h2':
                 agent.movej(home_pos2)
             elif test_case == 'gripper':
@@ -78,8 +103,7 @@ if __name__ == '__main__':
                 agent.movel([0, 0, -95, 0, 0, 0])
                 agent.close_gripper()
                 agent.movej(home_pos)
-                agent.open_gripper()
-
+                # agent.open_gripper()
             elif test_case == 'pp':
                 agent.movej(home_pos)
                 agent.open_gripper()
@@ -122,6 +146,31 @@ if __name__ == '__main__':
                 agent.movel([-90, 0, -90, 0, 0, 0])
                 agent.movej(basket_pos3)
                 agent.open_gripper()
+
+            elif test_case == 'welcome':
+                welcome_pose1 = [55, -15, -97, 0, 109, 49]
+                welcome_pose2 = [47, -24, -110, 0, 79, 90]
+
+                agent.movej(HOME_POS)
+
+                t = threading.Thread(target=speak_secnario, args=('1',))
+                t.start()
+                agent.movej(welcome_pose1)
+                agent.movej([0, 0, 0, 0, 10, 0], rel=True)
+                agent.movej([0, 0, 0, 0, -20, 0], rel=True)
+                agent.movej([0, 0, 0, 0, 20, 0], rel=True)
+                agent.movej([0, 0, 0, 0, -10, 0], rel=True)
+
+                agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+                agent.movel([-150, 0, -150, 0, 0, 0], rel=True)
+                agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+
+                agent.movej(welcome_pose2)
+                agent.close_gripper()
+                agent.open_gripper()
+                agent.close_gripper()
+                agent.open_gripper()
+
             elif test_case == 'belt_on':
                 if ser.readable():
                     ser.write('1'.encode('utf-8'))

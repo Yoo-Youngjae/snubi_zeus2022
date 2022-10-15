@@ -77,10 +77,19 @@ def main():
     # 좌표계의 정의
     _BASE = Base()
     # 로봇과 연결 시작 초기화
-    rb.open()
+    try:
+        rb.open()
+    except:
+        ans = input("Turn on the servo man! Did you turn it on?(y/n) >> ")
+        if ans == 'y':
+            rb.open()
+        else:
+            print("You didn'y turn it on man...")
+            return
     # I/O 입출력 기능의 초기화 
     IOinit(rb)
-    motion = MotionParam(jnt_speed=30, lin_speed=450, pose_speed=60, acctime=0.4, dacctime=0.4, overlap=20)
+    # motion = MotionParam(jnt_speed=30, lin_speed=450, pose_speed=60, acctime=0.4, dacctime=0.4, overlap=20)
+    motion = MotionParam(jnt_speed=10, lin_speed=150, pose_speed=20, acctime=0.1, dacctime=0.1, overlap=20)
     #MotionParam 형으로 동작 조건 설정
     rb.motionparam(motion)
 

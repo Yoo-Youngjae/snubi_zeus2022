@@ -34,7 +34,6 @@ def register_zeus_snu():
     json_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/data/trainval.json"
     image_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/data/images"
     name = "zeus_snu"
-    weight_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_model_final.pth"
+    weight_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/model_final.pth"
     registet_dataset(name, json_path, image_path)
-    register_cfg(name, 13, weight_path)
-
+    register_cfg(name, 18, weight_path)

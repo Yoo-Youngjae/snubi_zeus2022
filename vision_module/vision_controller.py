@@ -85,4 +85,4 @@ class DetectronController:
                 img = cv2.circle(img, (center_x, center_y), 10, (0, 0, 255), -1)
             center_coordinate_list.append((center_x, center_y, min_width_angle, obj_class))
         object_label_np = outputs["instances"].to("cpu").pred_classes.numpy()
-        return sorted(center_coordinate_list, key=lambda tup: tup[0]), img, list(object_label_np)
+        return sorted(center_coordinate_list, key=lambda tup: tup[0], reverse=True), img, list(object_label_np)

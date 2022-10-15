@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.main, name="main"),
     path("camera",views.camera, name="camera"), # logitec camera
     path("face",views.face, name="face"), # face camera
+    #path("pages",views.pages, name="pages"),
 ]

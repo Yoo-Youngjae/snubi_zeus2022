@@ -78,7 +78,7 @@ if __name__ == '__main__':
         # exception handling
         if len(center_coordinate_list) > 0: # some object detected
             print(center_coordinate_list[0])
-            if center_coordinate_list[0][0] < 230: # wait for robot picking
+            if center_coordinate_list[0][0] > 1000: # wait for robot picking
                 vision_agent.belt_on_off(0)
             else:
                 vision_agent.belt_on_off(1)
