@@ -22,6 +22,15 @@
 
 <!-- 2번 화면(detectron) -->
 {% if page == 1 %}
+<div class="center">
+  <img src="{% static 'main/img/0page.gif' %}"  width="1000px" height="550px"> <br>
+  <!-- 2번 화면으로 이동하는 버튼 -->
+  <form method="POST">
+    {% csrf_token %}
+    <button id="move_page" name="move_page" value="2" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">Detectron Page</button>
+  </form>
+</div>
+{% elif page == 2 %}
 <div class="row" style="margin-left:50px; margin-right:50px; margin-top:10px;">
 <div style="width:49%; float:left;">
   <table class="col-md-15" id="star_table" style = "width:100%;">
@@ -64,16 +73,16 @@
       </div>
   </div>
 </div>
-<!-- 2번 화면으로 이동하는 버튼 -->
+<!-- 3번 화면으로 이동하는 버튼 -->
 <div class="center" style="margin:5%;">
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="2" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">장바구니 결제</button>
+    <button id="move_page" name="move_page" value="3" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">장바구니 결제</button>
   </form>
 </div>
 
-<!-- 2번 화면 -->
-{% elif page == 2 %}
+<!-- 3번 화면 -->
+{% elif page == 3 %}
 <div class="row" style="margin-left:50px; margin-right:50px; margin-top:10px; overflow:hidden;">
   <div class="center" style="width:59%; float:left;">
     <img src="{% static 'main/img/2page.gif' %}" width="800px" height="480px"> <br>
@@ -84,18 +93,18 @@
   </div>
 </div>
 <div class="center" style="margin-left:50px; margin-right:50px; margin-top:15px; overflow:hidden;">
-    <!-- 3번 화면으로 이동하는 버튼 -->
+    <!-- 4번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="3" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">GOOD BYE~</button>
+    <button id="move_page" name="move_page" value="4" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">GOOD BYE~</button>
   </form>
 </div>
 
-<!-- 3번 화면 -->
-{% elif page == 3 %}
+<!-- 4번 화면 -->
+{% elif page == 4 %}
 <div class="center">
   <img src="{% static 'main/img/3page.gif' %}"  width="1000px" height="550px"> <br>
-  <!-- 1번 화면으로 이동하는 버튼 -->
+  <!-- 0번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
     <button id="move_page" name="move_page" value="0" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">처음화면</button>
@@ -105,11 +114,11 @@
 <!-- 0번 화면 -->
 {% else %}
 <div class="center">
-  <img src="{% static 'main/img/0page.gif' %}"  width="1000px" height="550px"> <br>
+  <img src="http://127.0.0.1:8000/face" style="width: 620px; height: 480px"/>
   <!-- 1번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="1" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">Detectron Page</button>
+    <button id="move_page" name="move_page" value="1" style="margin-top: 15pt; background-color: rgb(21, 101, 192)" type="submit" class="btn waves-effect waves-effect">Welcome Page</button>
   </form>
 </div>
 {% endif %}
@@ -126,6 +135,11 @@
 <script>
     $('#move_page').val();
     $(document).fromId.submit();
+</script>
+<script>
+  function reloading(){
+    location.reload();
+  }
 </script>
 {% endblock %}
 

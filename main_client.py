@@ -3,22 +3,11 @@
 from robot.Agent import Agent
 
 # add jokim
-from stt import Speech_Recognition
-from stt.Text_to_Speech import speak_secnario
+from stt import SpeechRecognition
+from stt.TextToSpeech import speak_secnario
 from importlib import reload
 import time
-
-# global variable
-home_pos = [68, -9, -102, 0, -69, 69]
-place_pos = [-46, -8, -65, 0, -106, -45]
-egg_pos = [113, 3, -126, 0, -57, 114]
-
-egg_class = 7
-
-basket_temp = [0, 0, 140, 5, -135, 75]
-basket_pos1 = [25, 48, 139, -125, -124, 115]
-basket_pos2 = [91, -2, 127, -78, -94, 148]
-basket_pos3 = [164, -5, 92, -88, -58, 186]
+from robot_global_variable import *
 
 
 def main_yjyoo(agent):
@@ -27,26 +16,26 @@ def main_yjyoo(agent):
     start_time = time.time()
     object_start_time = None
     exist_egg = False
-    while time.time() - start_time <= 300:
+    while time.time() - start_time <= BELT_MAX_TIME:
         if object_start_time is None:
             object_start_time = time.time()
         # 1. go home posision
-        agent.movej(home_pos, rel=False)
+        agent.movej(HOME_POS, rel=False)
         center_coordinate_list = agent.get_object_coordnates_by_vision_agent()
         if len(center_coordinate_list) == 0: # 물체 등장 없음
             print(round(time.time() - object_start_time))
             time.sleep(1)
-            if time.time() - object_start_time >= 10:  # 10 초이상 물체 등장 안함
+            if time.time() - object_start_time >= BELT_STOP_TIME:  # 10 초이상 물체 등장 안함
                 if exist_egg:
-                    agent.movej(egg_pos, rel=False)
-                    agent.movel([0, 0, -50, 0, 0, 0])
+                    agent.movej(EGG_POS, rel=False)
+                    agent.movel([0, 0, -80, 0, 0, 0])
                     agent.close_gripper()
                     agent.movel([0, 0, 100, 0, 0, 0])
-                    agent.movej(place_pos, rel=False)
-                    agent.movel([0, 0, -150, 0, 0, 0])
+                    agent.movej(PLACE_POS, rel=False)
+                    agent.movel([60, 0, -350, 0, 0, 0])
                     agent.open_gripper()
-                    agent.movej(place_pos, rel=False)
-                    agent.movej(home_pos, rel=False)
+                    agent.movej(PLACE_POS, rel=False)
+                    agent.movej(HOME_POS, rel=False)
                 break
             continue
         object_start_time = None
@@ -71,31 +60,34 @@ def main_yjyoo(agent):
         # 4. grasp
         agent.close_gripper()
         # 5. go to place position
-        agent.movej(home_pos)
+        agent.movej(HOME_POS)
         agent.movel([0, 0, 260, 0, 0, 0])
 
-        if int(object_class) == egg_class:
+        if int(object_class) == EGG_CLASS_NUM:
             speak_secnario('3')
             exist_egg = True
-            agent.movej(egg_pos, rel=False)
-            agent.movel([0, 0, -50, 0, 0, 0])
+            agent.movej(EGG_POS, rel=False)
+            agent.movel([0, 0, -80, 0, 0, 0])
             agent.open_gripper()
             agent.movel([0, 0, 100, 0, 0, 0])
             continue
-            # todo : put egg in egg place
-        agent.movej(place_pos, rel=False)
+        agent.movej(PLACE_POS, rel=False)
         # 6. go to empty place
-        #agent.movel([0, 0, -150, 0, 0, 0])
-        agent.movel([0, 0, -120, 0, 0, 0])
+        agent.movel([60, 0, -350, 0, 0, 0])
         # 7. release the gripper
         agent.open_gripper()
         # 8. back to the place position
-        agent.movej(place_pos, rel=False)
+        agent.movej(PLACE_POS, rel=False)
 
-        agent.movej(home_pos, rel=False)
+        agent.movej(HOME_POS, rel=False)
 
 def place_motion(agent):
-    agent.movej(home_pos)
+    basket_temp = [0, 0, 140, 5, -135, 75]
+    basket_pos1 = [25, 48, 139, -125, -124, 115]
+    basket_pos2 = [91, -2, 127, -78, -94, 148]
+    basket_pos3 = [164, -5, 92, -88, -58, 186]
+
+    agent.movej(HOME_POS)
     agent.movej([0, 0, 0, 0, 0, 0])
     agent.movej(basket_temp)
     agent.movej(basket_pos1)
@@ -115,7 +107,7 @@ def place_motion(agent):
 def main_jokim(agent):
     print("Start shopping")
 
-    agent.movej(home_pos)
+    agent.movej(HOME_POS)
 
     speak_secnario('1')
     # speak_secnario('4')
@@ -143,7 +135,7 @@ def main_jokim(agent):
 def main_full(agent):
     while True:
         print('1. start. go to home pose')
-        agent.movej(home_pos)
+        agent.movej(HOME_POS)
         speak_secnario('1')
         stt_res = agent.stt_controller.stt(SEC=3)
         if stt_res == 'yes':

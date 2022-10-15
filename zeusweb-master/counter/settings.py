@@ -32,20 +32,21 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'webpush',
+    'main',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -72,7 +73,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'counter.wsgi.application'
 
-
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": "Vapid Public Key",
+    "VAPID_PRIVATE_KEY":"Vapid Private Key",
+    "VAPID_ADMIN_EMAIL": "admin@example.com"
+}
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 

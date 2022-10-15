@@ -20,7 +20,7 @@ class STTController:
         pos_list = ['n', 'net', 'that', 'yeah']
         neg_list = ['and', 'anyour', 'anio', 'an your', 'honey',
                     'annewyork', 'anual', 'annne', 'i your', 'an',
-                    'andne', 'a u', 'annual', 'annneual', 'your', 'no',
+                    'andne', 'a u', 'annual', 'annneual', 'your',
                     'and you', 'nineion', 'when you', 'a no', 'hor',
                     'anu', 'hano', 'ano', 'ananyion', 'ninee', 'ahnoor',
                     'hio', 'a your', 'hanor', 'hanio', 'anl', 'hanne',

@@ -2,7 +2,7 @@ import socket
 import rospy
 import time
 from std_msgs.msg import Int16, Int32MultiArray
-from stt.Speech_Recognition import STTController
+from stt.SpeechRecognition import STTController
 class Agent:
     def __init__(self):
         rospy.init_node('snubi_main_agent')

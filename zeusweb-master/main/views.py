@@ -13,6 +13,10 @@ from std_msgs.msg import Int16, Int32MultiArray
 from cv_bridge import CvBridge
 import rospy
 
+import mediapipe as mp
+
+
+
 product_name = ['Blue_Bottle', 'Chocolate', 'Clock', 'Color_Nail', 'Fish', 'Pink_Bottle', 'Remover', 'Round_Bread', 'Square_Bread', 'Sweet_Potato', 'Tomato', 'Toothpaste', 'Wet_Tissue']
 product_price = [3000, 1000, 3500, 1500, 4000, 3000, 2000, 3200, 3800, 4500, 4800, 2000, 2000]
 
@@ -38,10 +42,11 @@ def main(request):
         page = subscribe_tester.page
         signal = False
         return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
-    # page = 0: 시작페이지 (default)
-    # page = 1: detectron 페이지
-    # page = 2: 총액 안내 및 로봇 액션 페이지
-    # page = 3: Good bye 페이지
+    # page = 0: facedetection 페이지 (default)
+    # page = 1: Welcome 페이지
+    # page = 2: detectron 페이지
+    # page = 3: 총액 안내 및 장바구니 전달 페이지
+    # page = 4: Good bye 페이지
     return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
 
 class SubscribeTester:
@@ -86,7 +91,8 @@ class SubscribeTester:
                 print(products)
 
 
-class VideoCamera(object):
+# detectron camera
+class DetectronVideoCamera(object):
     def __init__(self):
         self.frame = subscribe_tester.cv_image
         threading.Thread(target=self.update, args=()).start()
@@ -100,17 +106,75 @@ class VideoCamera(object):
         while True:
             self.frame = subscribe_tester.cv_image
 
+class FaceVideoCamera(object):
+
+    def __init__(self):
+        self.video = cv2.VideoCapture(2)
+        (self.grabbed, self.frame) = self.video.read()
+        self.mpDraw = mp.solutions.drawing_utils
+        self.mpFaceMesh = mp.solutions.face_mesh
+        self.faceMesh = self.mpFaceMesh.FaceMesh(max_num_faces=1)
+        self.drawSpec = self.mpDraw.DrawingSpec(thickness=1, circle_radius=1)
+        threading.Thread(target=self.update, args=()).start()
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        image = self.frame
+        _, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+    def update(self):
+        while True:
+            (self.grabbed, self.frame) = self.video.read()
+            imgRGB = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+            results = self.faceMesh.process(imgRGB)
+            if results.multi_face_landmarks:
+                for faceLms in results.multi_face_landmarks:
+                    self.mpDraw.draw_landmarks(self.frame, faceLms, self.mpFaceMesh.FACEMESH_CONTOURS, self.drawSpec, self.drawSpec)
+                    for id, lm in enumerate(faceLms.landmark):
+                        ih, iw, ic = self.frame.shape
+                        x, y = int(lm.x * iw), int(lm.y * ih)
+                        #print(id, x, y)
+
+            #cv2.imshow("Image", img)
+            #cv2.waitKey(1)
+
+
+def detectron_gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield(b'--frame\r\n'
+              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+def face_gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield(b'--frame\r\n'
+              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 def gen(camera):
     while True:
         frame = camera.get_frame()
         yield(b'--frame\r\n'
               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+
 @gzip.gzip_page
 def camera(request):
     try:
-        cam = VideoCamera()
+        cam = DetectronVideoCamera()
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+    except:  # This is bad! replace it with proper handling
+        print("에러입니다...")
+        pass
+
+@gzip.gzip_page
+def face(request):
+    try:
+        facecam = FaceVideoCamera()
+        return StreamingHttpResponse(gen(facecam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         print("에러입니다...")
         pass

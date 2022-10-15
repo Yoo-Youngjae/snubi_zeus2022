@@ -26,6 +26,8 @@
   {% endblock %}
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
+{% load livereload_tags %}
+{% livereload_script %}
 
 <!--overflow-y: hidden-->
 <body style="overflow-x: hidden;"></body>
@@ -51,6 +53,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     {% block script %}
     {% endblock %}
-  </body>
+</body>
   
-  </html>
+</html>

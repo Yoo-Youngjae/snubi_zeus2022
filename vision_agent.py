@@ -5,6 +5,7 @@ from std_msgs.msg import Int16, Int32MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import rospy
+from robot_global_variable import *
 
 class VisionAgent:
     def __init__(self):
@@ -22,13 +23,13 @@ class VisionAgent:
                 cap.release()
             index += 1
         print('camera id lists', arr)
-        camera_idx = 2
+        camera_idx = DETECTRON_CAMERA_ID
         capture = cv2.VideoCapture(camera_idx)
         capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         self.capture = capture
         # for conveyor belt
-        self.belt_switch = serial.Serial('/dev/ttyUSB0', 9600)
+        self.belt_switch = serial.Serial(BELT_USB_PORT, 9600)
         self.belt_sub = rospy.Subscriber('/belt_switch', Int16, self.belt_callback)
         self.object_labels_pub = rospy.Publisher('/object_labels', Int32MultiArray, queue_size=10)
         self.detectron_pub = rospy.Publisher('/detectron_img', Image, queue_size=10)
