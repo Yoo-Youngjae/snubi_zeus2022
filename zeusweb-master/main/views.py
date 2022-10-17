@@ -27,6 +27,9 @@ def main(request):
     global page
     if request.method == 'POST': # 지금은 버튼 이벤트로 1을 받아오도록 구현
         page = subscribe_tester.page
+        if request.POST.get("move_page") != None: # python request test용
+            page = int(request.POST.get("move_page"))
+            print('Python request: '+ page)
 
     return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
 
