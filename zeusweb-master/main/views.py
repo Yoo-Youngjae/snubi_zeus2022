@@ -1,20 +1,18 @@
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators import gzip
-from django.http import StreamingHttpResponse, JsonResponse, HttpResponse
+from django.http import StreamingHttpResponse, JsonResponse, HttpResponse, HttpResponseRedirect
 import cv2
 import threading
-from django.template import loader
-from playsound import playsound
+from django.urls import reverse
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
+from playsound import playsound
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16, Int32MultiArray
 from cv_bridge import CvBridge
 import rospy
-
-import mediapipe as mp
 
 product_name = ['JellO', 'Doraemon', 'Egg', 'ChocolateMilk', 'GardeningSet', 'Tomato', 'Carrot', 'Fish', 'AlmondMilk',
                 'AppleJuice', 'WetTissue', 'Tea', 'Clock', 'StrawberryMilk','SweetPotato', 'Sponge', 'SquareBread', 'RoundBread', 'Soap']
@@ -24,21 +22,12 @@ total_price = 0
 products = []
 object_list = []
 page = 0
-signal = False
-
 
 def main(request):
     global page
     if request.method == 'POST': # 지금은 버튼 이벤트로 1을 받아오도록 구현
-        page = int(request.POST.get("move_page"))
-        print(page)
-        #page = subscribe_tester.page
-        return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
-    # page = 0: facedetection 페이지 (default)
-    # page = 1: Welcome 페이지
-    # page = 2: detectron 페이지
-    # page = 3: 총액 안내 및 장바구니 전달 페이지
-    # page = 4: Good bye 페이지
+        page = subscribe_tester.page
+
     return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page})
 
 class SubscribeTester:
@@ -64,13 +53,6 @@ class SubscribeTester:
 
     def _object_label_callback(self, data):
         self.object_label_list = list(data.data)
-
-        ##### if len(object_label_list) == 0 인 상태로 10초 지속 #####
-        # TTS) 더 이상 구매하실 물건이 없나요?
-        # STT) yes 받아오기
-        # 결제 안내 및 장바구니 전달 화면으로 넘어감
-        # page = 2
-        #############################################################
 
         for i in self.object_label_list:
             if i not in object_list:
