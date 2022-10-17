@@ -12,18 +12,19 @@
 {% endblock %}
 
 {% block main %}
-<header>
-  <nav class="blue darken-3 z-depth-1"> <!-- 색상 변경 -->
-    <div class="nav-wrapper container">
-      <a href="/" class="brand-logo">SNUBI MART</a>
-    </div>
-  </nav>
-</header>
-
+<div id = 'banner'>
+    <header>
+        <nav class="blue darken-3 z-depth-1"> <!-- 색상 변경 -->
+            <div class="nav-wrapper container">
+                <a href="/" class="brand-logo">SNUBI MART</a>
+            </div>
+        </nav>
+    </header>
+</div>
 
 
 <!-- 2번 화면(detectron) -->
-<div id = "main">
+<div id = "zeus_page">
 {% if page == 1 %}
 <div class="center">
   <img src="{% static 'main/img/0page.gif' %}"  width="1000px" height="550px"> <br>
@@ -140,16 +141,19 @@
     $(document).fromId.submit();
 </script>
 <script>
-  window.setTimeout(function () {
-    updateDiv()
-  }, 3000); // refresh/redirect after 5 seconds.
-</script>
-<script>
-  function updateDiv() {
-    $( "#main" ).load(window.location.href + " #main" );
-  }
-</script>
+    $(function() {
+    timer = setInterval( function () {
+        $.ajax ({
+            type: 'POST',
+            url : "http://127.0.0.1:8000",
+            cache : false,
+            success : function (response) {
+            $("#zeus_page").html(response);
+            }
+    
+        });
+        }, 1000);
+    });
+    </script>
 
 {% endblock %}
-
-
