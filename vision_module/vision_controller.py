@@ -10,13 +10,13 @@ from detectron2.data import MetadataCatalog
 from detectron2.config import get_cfg
 import math
 
-barcode_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/barcode.yaml'
-zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_snu.yaml'
+#barcode_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/barcode.yaml'
+zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_r_50.yaml'
 
 class DetectronController:
     def __init__(self):
         cfg = get_cfg()
-        cfg.merge_from_file(zeus_cfg) # cfg file change(barcode <-> zeus)
+        cfg.merge_from_file(zeus_cfg) # cfg file change
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
         self.cfg = cfg
         self.predictor = DefaultPredictor(cfg)

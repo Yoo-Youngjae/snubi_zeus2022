@@ -1,5 +1,4 @@
 {% load static %}
-{% load livereload_tags %}
 <html>
 <head>
   <meta charset="UTF-8">
@@ -25,7 +24,6 @@
   {% block style %}
   {% endblock %}
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
-  {% livereload_script %}
 
 </head>
 
@@ -41,7 +39,7 @@
         <div class="footer-copyright black-text grey lighten-4">
             <div class="container">
               <div class="copyright center" style="margin-bottom: 5px;">
-                <span class="grey-text text-darken-2">
+                <span class="grey-text text-darken-2" style="margin-left: 100pt">
                   © 2022 R-biz Challenge Team SNUBI
                 </span>
               </div>

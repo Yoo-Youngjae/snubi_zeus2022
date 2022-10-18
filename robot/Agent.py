@@ -3,6 +3,7 @@ import rospy
 import time
 from std_msgs.msg import Int16, Int32MultiArray
 from stt.SpeechRecognition import STTController
+import requests
 class Agent:
     def __init__(self):
         rospy.init_node('snubi_main_agent')
@@ -12,7 +13,7 @@ class Agent:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # socket() 소켓서버 생성
         self.client_socket.connect((ip_addr, port))  # address에 있는 원격 소켓에 연결
         self.belt_pub = rospy.Publisher('/belt_switch', Int16, queue_size=2)
-        self.ui_pub = rospy.Publisher('/page_num', Int16, queue_size=2)
+        self.user_id_pub = rospy.Publisher('/user_id', Int16, queue_size=2)
         self.object_coord_sub = rospy.Subscriber('/coord_list', Int32MultiArray, self.coord_list_callback)
         self.stt_controller = STTController()
 
@@ -74,4 +75,9 @@ class Agent:
         return self.object_coord_list
 
     def ui_page_go(self, num):
-        self.ui_pub.publish(num)
+        URL = 'http://localhost:8000'
+        data = {'move_page': str(num)}
+        res = requests.post(URL, data=data)
+
+    def user_id_go(self, user_id):
+        self.user_id_pub.publish(int(user_id))

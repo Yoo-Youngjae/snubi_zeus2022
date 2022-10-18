@@ -13,6 +13,8 @@ def main_pick_and_place(agent):
     agent.belt_on()
     agent.open_gripper()
     start_time = time.time()
+    agent.movej(HOME_POS, rel=False)
+    time.sleep(3)
     object_start_time = None
     exist_egg = False
     while time.time() - start_time <= BELT_MAX_TIME:
@@ -44,7 +46,7 @@ def main_pick_and_place(agent):
         if target_object_x < 950:
             continue
         print('1) objects coord', (target_object_x, target_object_y), object_angle)
-        y_offset = int((400 - target_object_y) // 15 * 10) + 100
+        y_offset = int((400 - target_object_y) // 15 * 10) + 70
         gripper_angle = 90 - object_angle
 
         # 2. detection object and get distance
@@ -62,7 +64,7 @@ def main_pick_and_place(agent):
 
         if int(object_class) == EGG_CLASS_NUM:
             agent.movel([0, 0, 260, 0, 0, 0])
-            speak_secnario('3')
+            speak_secnario('3-2')
             exist_egg = True
             agent.movej(EGG_POS, rel=False)
             agent.movel([0, 0, -80, 0, 0, 0])
@@ -70,7 +72,7 @@ def main_pick_and_place(agent):
             agent.movel([0, 0, 100, 0, 0, 0])
             continue
         if int(object_class) == MILK_CLASS_NUM:
-            # speak_secnario('3') # todo : add milk tts
+            speak_secnario('3-3')
             agent.movej(HOME_POS)
             pass_though(agent)
             continue
@@ -156,36 +158,38 @@ def main_jokim(agent):
     speak_secnario('7')
 
 def main_full(agent):
+    speak_secnario('1')
+    detected_user_id = 0
     while True:
         print('1. start. go to home pose')
         agent.movej(HOME_POS)
-        t = threading.Thread(target=speak_secnario, args=('1',))
-        t.start()
-
-        welcome_motion(agent)
-
-        stt_res = agent.stt_controller.stt(SEC=3)
-        if stt_res == 'yes':
+        # todo : add face detection
+        if detected_user_id != -1:
             break
+    # 2. user detection & welcome motion
+    agent.ui_page_go(2)
+    t = threading.Thread(target=speak_secnario, args=('2', detected_user_id))
+    t.start()
+    welcome_motion(agent)
+
     while True:
         # detectron page
-        agent.ui_page_go(2)
+        agent.ui_page_go(3)
         print('2. belt_on. calc start')
-        speak_secnario('2')
+        speak_secnario('3-1')
         main_pick_and_place(agent)
         print('3. end calc.')
         agent.belt_off()
-        speak_secnario('4')
+        speak_secnario('3-4')
         stt_res = agent.stt_controller.stt(SEC=3)
         if stt_res == 'yes':
             break
-    agent.ui_page_go(3)
-    speak_secnario('5')
-    speak_secnario('6')
-    place_motion(agent)
     agent.ui_page_go(4)
-    speak_secnario('7')
-    agent.ui_page_go(0)
+    speak_secnario('4')
+    place_motion(agent)
+    agent.ui_page_go(5)
+    speak_secnario('5')
+    agent.ui_page_go(1)
 
 if __name__ == '__main__':
     try:
@@ -202,6 +206,10 @@ if __name__ == '__main__':
                 main_jokim(agent)
             if test_case == 'quit' or test_case == 'q':
                 break
+            if test_case >= '0' and test_case <= '4':
+                agent.ui_page_go(test_case)
+            if test_case >= '11' and test_case <= '13':
+                agent.user_id_go(test_case[1])
     except Exception as e:
         print(e)
     finally:

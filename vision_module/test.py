@@ -29,7 +29,7 @@ os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 # trainer = DefaultTrainer(cfg)
 # trainer.resume_or_load(resume=False)
 # trainer.train()
-cfg.MODEL.WEIGHTS = "./output/model_final.pth"
+cfg.MODEL.WEIGHTS = "./output/model_final_1011.pth"
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5   # set the testing threshold for this model
 cfg.DATASETS.TEST = ("zeus_snu", )
 predictor = DefaultPredictor(cfg)

@@ -3,6 +3,7 @@
 import os
 import sys
 import cv2
+import rospy
 
 
 def main():

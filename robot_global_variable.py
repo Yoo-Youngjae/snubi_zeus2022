@@ -5,11 +5,11 @@ PLACE_POS = [-39, -13, -30, 0, -135, -38]
 EGG_POS = [113, 3, -126, 0, -57, 114]
 
 # class variable
-EGG_CLASS_NUM = 7
-MILK_CLASS_NUM = 3
+EGG_CLASS_NUM = 6
+MILK_CLASS_NUM = 14
 
 # time variable
-BELT_STOP_TIME = 5
+BELT_STOP_TIME = 7
 BELT_MAX_TIME = 300
 
 # DEVICE_ID

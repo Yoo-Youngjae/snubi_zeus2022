@@ -1,20 +1,34 @@
 from playsound import playsound
-
-def speak_secnario(num):
+import time
+def speak_secnario(num, user_id=0):
     if num == '1':
-        playsound("stt/tts_audio/1.mp3") #01_안녕하세요_스누비마트에_오신_것을_환영합니다____저는_스누비마트의_마스코트_누비입
+        playsound("stt/tts_audio/1-1.mp3") #안녕하세요. 스누비 마트에 오신 것을 환영합니다.
+        playsound("stt/tts_audio/1-2.mp3") #저는 스누비 마트의 마스코트. 누비,입니다.
+        playsound("stt/tts_audio/1-3.mp3") #얼굴이 드러나게, 가까이 와 주세요.
     elif num == '2':
-        playsound("stt/tts_audio/2.mp3") #02_벨트_위에_물건을_차례차례_올려주세요
-    elif num == '3':
-        playsound("stt/tts_audio/3.mp3") #03_깨지기_쉬운_계란은_나중에_넣을게요.mp3
+        if user_id == 0:
+            playsound("stt/tts_audio/2-1-0.mp3") #안녕하세요 고객님. 오늘도 스누비 마트를 방문해주셔서 감사합니다.
+        elif user_id == 1:
+            playsound("stt/tts_audio/2-1-1.mp3") #안녕하세요 준오님. 오늘도 스누비 마트를 방문해주셔서 감사합니다.
+        elif user_id == 2:
+            playsound("stt/tts_audio/2-1-2.mp3") #안녕하세요 예솔님. 오늘도 스누비 마트를 방문해주셔서 감사합니다.
+        playsound("stt/tts_audio/2-2.mp3") #상품 계산을 시작하겠습니다.
+    elif num == '3-1':
+        playsound("stt/tts_audio/3-1.mp3") #벨트 위에 물건을 차례차례 올려주세요!
+    elif num == '3-2':
+        playsound("stt/tts_audio/3-2.mp3") #손상되기 쉬운 물건은, 나중에 넣을게요!
+    elif num == '3-3':
+        playsound("stt/tts_audio/3-3.mp3") #죄송합니다. 유통기한이 지난 상품이네요. 이건 제가 수거하도록 하겠습니다!
+    elif num == '3-4':
+        playsound("stt/tts_audio/3-4.mp3") #더 이상 구매하실 물건이 없으신가요?
     elif num == '4':
-        playsound("stt/tts_audio/4.mp3") #04_더_이상_구매하실_물건이_없나요_
+        playsound("stt/tts_audio/4-1.mp3") #오늘 구매하시는 물건의 총액은 다음과 같네요!
+        playsound("stt/tts_audio/4-2.mp3") #등록된 결제 정보를 화면에서 확인해 주세요!
+        playsound("stt/tts_audio/4-3.mp3") #해당 결제 정보로, 결제를 진행하겠습니다.
+        # todo : time.sleep
+        playsound("stt/tts_audio/4-4.mp3") #계산이 모두 완료되었습니다! 장바구니를 받아주세요!
     elif num == '5':
-        playsound("stt/tts_audio/5.mp3") #05_오늘_구매하시는_물건의_총액은_다음과_같네요_미리_등록해두신_결제_정보로_결제를_진행해
-    elif num == '6':
-        playsound("stt/tts_audio/6.mp3") #07_계산이_모두_완료되었습니다_장바구니를_받아주세요
-    elif num == '7':
-        playsound("stt/tts_audio/7.mp3") #08_오늘도_스누비마트를_이용해주셔서_감사합니다_행복한_하루_보내세요
-
+        playsound("stt/tts_audio/5-1.mp3") #오늘도 스누비 마트를 이용해 주셔서 감사합니다.
+        playsound("stt/tts_audio/5-2.mp3") #행복한 하루 보내세요!
 
 
