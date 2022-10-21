@@ -99,12 +99,12 @@
           </div>
           {% if user == 1 %}
           <!-- 김준오 -->
-          <img src="{% static 'main/img/lpay_card.png' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
+          <img src="{% static 'main/img/lpay_card.jpg' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
           {% elif user == 2 %}
-          <!-- 김준오 -->
-          <img src="{% static 'main/img/kakao_card.png' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
+          <!-- 박예솔 -->
+          <img src="{% static 'main/img/kakao_card.jpg' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
           {% else %}
-          <img src="{% static 'main/img/samsung_card.png' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
+          <img src="{% static 'main/img/samsung_card.jpg' %}" style="margin-top: 5pt; width: 360px; height: 225px"> <br>
           {% endif %}
       </div>
   </div>
@@ -130,17 +130,35 @@
 
 <!-- 1번 화면 -->
 {% else %}
-<div class="center">
-  <img src="http://127.0.0.1:8000/face" style="margin-top: 40pt; width: 1000px; height: 580px"/>
-  <!-- 1번 화면으로 이동하는 버튼 -->
-  <form method="POST">
-    {% csrf_token %}
-    <button id="move_page" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit" >Welcome Page</button>
-  </form>
+<div class="row" style="margin-left:5px; margin-right:5px;margin-top:10px overflow:hidden;">
+  <div class="left" style="width:49%; float:left;">
+    <img src="{% static 'main/img/nubi.gif' %}" style="margin-top: 70pt; width: 800px; height: 480px"> <br>
+  </div>
+
+ <div class="right" style="width:49%; float:right;">
+      <div style="margin-top:10pt;margin-right:50px;">
+         <table class="col-md-15" id="star_table" style = "width:100%;">
+            <tr class="text-center" style = "text-align: center"><p><h5><b> 얼굴을 가까이 와주세요!</b></h5></p></tr><br>
+            <tr>
+                <td>
+                    <img src="http://127.0.0.1:8000/face" style="width: 620px; height: 480px"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</div>
+<div class = "center">
+    <form method="POST" style="float:left">
+        {% csrf_token %}
+        <button id="move_page" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">Welcome Page</button>
+    </form>
 </div>
 {% endif %}
 {% endblock %}
 </div>
+
+
 
 {% block script %}
 <script>

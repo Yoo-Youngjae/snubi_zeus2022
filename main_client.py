@@ -27,23 +27,14 @@ def main_pick_and_place(agent):
             print(round(time.time() - object_start_time))
             time.sleep(1)
             if time.time() - object_start_time >= BELT_STOP_TIME:  # 10 초이상 물체 등장 안함
-                if exist_egg:
-                    agent.movej(EGG_POS, rel=False)
-                    agent.movel([0, 0, -80, 0, 0, 0])
-                    agent.close_gripper()
-                    agent.movel([0, 0, 100, 0, 0, 0])
-                    agent.movej(PLACE_POS, rel=False)
-                    agent.movel([60, 0, -350, 0, 0, 0])
-                    agent.open_gripper()
-                    agent.movej(PLACE_POS, rel=False)
-                    agent.movej(HOME_POS, rel=False)
-                break
+                return exist_egg
             continue
         object_start_time = None
         target_object_x, target_object_y = center_coordinate_list[0], center_coordinate_list[1]
         object_angle, object_class = center_coordinate_list[2], center_coordinate_list[3]
 
         if target_object_x < 950:
+            print('1-1) objects coord is too far to pick', (target_object_x, target_object_y), object_angle)
             continue
         print('1) objects coord', (target_object_x, target_object_y), object_angle)
         y_offset = int((400 - target_object_y) // 15 * 10) + 70
@@ -71,25 +62,26 @@ def main_pick_and_place(agent):
             agent.open_gripper()
             agent.movel([0, 0, 100, 0, 0, 0])
             continue
-        if int(object_class) == MILK_CLASS_NUM:
+        elif int(object_class) == MILK_CLASS_NUM:
             speak_secnario('3-3')
             agent.movej(HOME_POS)
             pass_though(agent)
             continue
+        else:
+            agent.movel([0, 0, 260, 0, 0, 0])
+            agent.movej(PLACE_POS, rel=False)
+            # 6. go to empty place
+            agent.movel([60, 0, -350, 0, 0, 0])
+            # 7. release the gripper
+            agent.open_gripper()
+            # 8. back to the place position
+            agent.movej(PLACE_POS, rel=False)
 
-        agent.movel([0, 0, 260, 0, 0, 0])
-        agent.movej(PLACE_POS, rel=False)
-        # 6. go to empty place
-        agent.movel([60, 0, -350, 0, 0, 0])
-        # 7. release the gripper
-        agent.open_gripper()
-        # 8. back to the place position
-        agent.movej(PLACE_POS, rel=False)
+            agent.movej(HOME_POS, rel=False)
 
-        agent.movej(HOME_POS, rel=False)
-
-
+    return exist_egg
 def pass_though(agent):
+    pass_though1 = [68, 0, -180, 0, 110, 0]
     pass_though1 = [68, 0, -180, 0, 110, 0]
     pass_though2 = [28, 0, -235, 0, 50, 0]
     pass_though3 = [38, 0, -180, 0, -110, 0]
@@ -149,6 +141,18 @@ def welcome_motion(agent):
     agent.close_gripper()
     agent.open_gripper()
 
+def place_egg(agent):
+    agent.movej(EGG_POS, rel=False)
+    agent.movel([0, 0, -80, 0, 0, 0])
+    agent.close_gripper()
+    agent.movel([0, 0, 100, 0, 0, 0])
+    agent.movej(PLACE_POS, rel=False)
+    agent.movel([60, 0, -350, 0, 0, 0])
+    agent.open_gripper()
+    agent.movej(PLACE_POS, rel=False)
+    agent.movej(HOME_POS, rel=False)
+
+
 def main_jokim(agent):
     print("Start shopping")
 
@@ -159,31 +163,39 @@ def main_jokim(agent):
 
 def main_full(agent):
     speak_secnario('1')
-    detected_user_id = 0
     while True:
         print('1. start. go to home pose')
         agent.movej(HOME_POS)
-        # todo : add face detection
+        detected_user_id = agent.detect_face_id()
         if detected_user_id != -1:
+            agent.user_id_go(detected_user_id)
             break
+    print('1-2. detected_user_id', detected_user_id)
+
     # 2. user detection & welcome motion
     agent.ui_page_go(2)
     t = threading.Thread(target=speak_secnario, args=('2', detected_user_id))
     t.start()
     welcome_motion(agent)
-
+    exist_egg = False
     while True:
         # detectron page
         agent.ui_page_go(3)
         print('2. belt_on. calc start')
         speak_secnario('3-1')
-        main_pick_and_place(agent)
+        exist_egg = main_pick_and_place(agent)
         print('3. end calc.')
         agent.belt_off()
         speak_secnario('3-4')
         stt_res = agent.stt_controller.stt(SEC=3)
         if stt_res == 'yes':
             break
+
+    # egg go to basket
+    if exist_egg:
+        speak_secnario('3-5')
+        place_egg(agent)
+
     agent.ui_page_go(4)
     speak_secnario('4')
     place_motion(agent)

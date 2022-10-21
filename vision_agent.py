@@ -17,7 +17,7 @@ class VisionAgent:
         index = 0
         arr = []
         for i in range(10):
-            cap = cv2.VideoCapture(0)
+            cap = cv2.VideoCapture(i)
             if cap.read()[0]:
                 arr.append(index)
                 cap.release()
@@ -32,7 +32,7 @@ class VisionAgent:
         self.belt_switch = serial.Serial(BELT_USB_PORT, 9600)
         self.belt_sub = rospy.Subscriber('/belt_switch', Int16, self.belt_callback)
         self.object_labels_pub = rospy.Publisher('/object_labels', Int32MultiArray, queue_size=10)
-        self.detectron_pub = rospy.Publisher('/detectron_img', Image, queue_size=10)
+        self.detectron_pub = rospy.Publisher('/detectron_img', Image, queue_size=1)
         self.belt_activate = False
 
     def belt_callback(self, data):
@@ -70,15 +70,15 @@ if __name__ == '__main__':
         vision_agent.coord_list_pub.publish(coord_list_msg)
         vision_agent.object_labels_pub.publish(object_labels_msg)
 
-        cv2.imshow("Detectron", img)
-        cv2.waitKey(1)
+        # cv2.imshow("Detectron", img)
+        # cv2.waitKey(1)
         detectron_img_msg = vision_agent.cv_bridge.cv2_to_imgmsg(img)
         vision_agent.detectron_pub.publish(detectron_img_msg)
 
         # exception handling
         if len(center_coordinate_list) > 0: # some object detected
             print(center_coordinate_list[0])
-            if center_coordinate_list[0][0] > 1000: # wait for robot picking
+            if center_coordinate_list[0][0] > 1000: # [stop] wait for robot picking
                 vision_agent.belt_on_off(0)
             else:
                 vision_agent.belt_on_off(1)

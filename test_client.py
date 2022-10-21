@@ -103,7 +103,15 @@ if __name__ == '__main__':
                 agent.movel([0, 0, -95, 0, 0, 0])
                 agent.close_gripper()
                 agent.movej(home_pos)
-                # agent.open_gripper()
+                agent.open_gripper()
+            elif test_case == 'pick20':
+                for i in range(20):
+                    agent.movej(home_pos)
+                    agent.movel([-90, 90, 0, 0, 0, 0])
+                    agent.movel([0, 0, -95, 0, 0, 0])
+                    agent.close_gripper()
+                    agent.movej(home_pos)
+                    agent.open_gripper()
             elif test_case == 'pp':
                 agent.movej(home_pos)
                 agent.open_gripper()
@@ -203,6 +211,38 @@ if __name__ == '__main__':
                 agent.movej([0, 0, 0, 0, 0, 30], rel=True)
             elif test_case == 'movej_6-':
                 agent.movej([0, 0, 0, 0, 0, -30], rel=True)
+            elif test_case == 'sky':
+                agent.movej([0, 0, 0, 0, 0, 0], rel=False)
+            elif test_case == 'snake':
+                agent.movej([0, 0, 0, 0, 0, 0], rel=False)
+                for i in range(10):
+                    agent.movej([0, 30, -60, 0, -30, 0], rel=False)
+                    agent.movej([0, -30, 60, 0, 30, 0], rel=False)
+            elif test_case == 'nyamnyam':
+                for i in range(20):
+                    agent.close_gripper()
+                    agent.open_gripper()
+            elif test_case == 'zeus' :
+                agent.movej([90,0,-180,0,180,0],rel=False)
+                time.sleep(2)
+                agent.movej([42, 0, -110, 0, 21, 0], rel=False)
+                time.sleep(10)
+                for i in range(10) :
+                    agent.movel([250, 0, 0, 0, 0, 0], rel=True)
+                    agent.movel([-250, 0, -250, 0, 0, 0], rel=True)
+                    agent.movel([250, 0, 0, 0, 0, 0], rel=True)
+                    agent.movel([-250, 0, 0, 0, 0, 0], rel=True)
+                    agent.movel([250, 0, 250, 0, 0, 0], rel=True)
+                    agent.movel([-250, 0, 0, 0, 0, 0], rel=True)
+            elif test_case == 'handMeThat' :
+                agent.movej(home_pos)
+                agent.open_gripper()
+                agent.movel([-160, 40, 0, 0, 0, 0])
+                agent.movel([0, 0, -95, 0, 0, 0])
+                agent.close_gripper()
+                agent.movej(home_pos)
+                agent.movej([125,-9,-102,0,-43,83], rel=False)
+
             elif test_case == 'q':
                 break
             else:

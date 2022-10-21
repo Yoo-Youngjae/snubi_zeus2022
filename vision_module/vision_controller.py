@@ -11,7 +11,7 @@ from detectron2.config import get_cfg
 import math
 
 #barcode_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/barcode.yaml'
-zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_r_50.yaml'
+zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_r_50_iter.yaml'
 
 class DetectronController:
     def __init__(self):

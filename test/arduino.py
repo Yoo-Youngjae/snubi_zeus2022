@@ -5,7 +5,7 @@ import time
 ser = serial.Serial('/dev/ttyUSB0', 9600)
 while True:
     if ser.readable():
-        val = input()
+        val = input('start(1) / stop(0) : ')
         if val == '1':
             val = val.encode('utf-8')
             ser.write(val)

@@ -84,7 +84,7 @@ def main():
         if ans == 'y':
             rb.open()
         else:
-            print("You didn'y turn it on man...")
+            print("You didn't turn it on man...")
             return
     # I/O 입출력 기능의 초기화 
     IOinit(rb)

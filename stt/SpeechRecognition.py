@@ -28,7 +28,8 @@ class STTController:
                     'anon', 'andyour', 'hneor', 'anneor', 'mano', 'aneo',
                     'a you', 'annu', 'nineu', 'on your', 'and your', 'a new',
                     'a knew', 'are knew', 'anewor', 'h knew', 'on you',
-                    'and no', 'oh you', 'anneo', 'i knew']
+                    'and no', 'oh you', 'anneo', 'i knew', 'i know',
+                    'i you', 'are you']
         beep('coin')
         record = sd.rec(FS * SEC, samplerate=FS, channels=1)
         sd.wait()
