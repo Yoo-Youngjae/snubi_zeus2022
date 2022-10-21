@@ -5,6 +5,7 @@ from cv_bridge import CvBridge
 import rospy
 from robot_global_variable import *
 from FaceDetection.face_cropper import FaceCropper
+import numpy as np
 
 class FaceAgent:
     def __init__(self):
@@ -32,6 +33,15 @@ class FaceAgent:
         self.face_crop_pub = rospy.Publisher('/face_crop_img', Image, queue_size=1)
         self.face_cropper = FaceCropper()
 
+        foreground_pil = Image.open('/home/snubi/PycharmProjects/snubi_zeus2022/FaceDetection/man_icon.png')
+        foreground_pil = foreground_pil.resize((600, 600))
+        data = np.array(foreground_pil)  # "data" is a height x width x 4 numpy array
+        red, green, blue, alpha = data.T  # Temporarily unpack the bands for readability
+
+        brown_areas = (red == 62) & (blue == 62) & (green == 62)
+        data[..., :-1][brown_areas.T] = (0, 0, 200)  # Transpose back needed
+        self.foreground_pil = Image.fromarray(data)
+
 
 if __name__ == '__main__':
     rospy.init_node('face_draw_agent')
@@ -39,6 +49,8 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         ret, img = face_agent.capture.read()
+        img = cv2.flip(img, 1)
+
         origin_img = img.copy()
         imgRGB = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
         results = face_agent.faceMesh.process(imgRGB)
@@ -47,7 +59,15 @@ if __name__ == '__main__':
             for faceLms in results.multi_face_landmarks:
                 face_agent.mpDraw.draw_landmarks(origin_img, faceLms, face_agent.mpFaceMesh.FACEMESH_CONTOURS,
                                       face_agent.drawSpec, face_agent.drawSpec)
-        face_img_msg = face_agent.cv_bridge.cv2_to_imgmsg(origin_img)
+
+        background_pil = Image.fromarray(origin_img).convert("RGBA")
+
+        width = (background_pil.width - face_agent.foreground_pil.width) // 2
+        height = (background_pil.height - face_agent.foreground_pil.height) // 2 + 100
+
+        background_pil.paste(face_agent.foreground_pil, (width, height), face_agent.foreground_pil)
+        composited_img = np.array(background_pil)
+        face_img_msg = face_agent.cv_bridge.cv2_to_imgmsg(composited_img)
         face_agent.face_pub.publish(face_img_msg)
 
         cropped_face_shape = []
