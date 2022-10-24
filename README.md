@@ -43,15 +43,18 @@ detectron model 코드
 3. h로 home_pos 이동, gripper로 그리퍼 갈아끼기 모션으로 이동
 4. 그밖에 추가적으로 필요하신 기능은 if 문 추가해서 만들어 주세요.
 
-### Running Detectron2 with webcam
+### Running Vision agent & Face agent
 
 ```Shell
-cd detectron2
-python demo/demo.py\
-    --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml\
-    --webcam\
-    --confidence-threshold 0.5\
-    --opts MODEL.WEIGHTS ../models/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl
+   (venv) python vision_agent.py
+   # another termianl
+   (venv) python face_agent.py
 
-# GPU VRAM COST : 2G 
+```
+### Running Django for Web UI
+
+```Shell
+   cd zeusweb-master
+   (venv) python manage.py runserver
+   # run "http://127.0.0.1:8000" in Chrome browser
 ```
