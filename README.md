@@ -55,10 +55,3 @@ python demo/demo.py\
 
 # GPU VRAM COST : 2G 
 ```
-Todo
-1. vision 모듈과 연결.
-2. 계산대 ui 모듈과 연결
-3. stt 모듈과 연결
-4. placing 위치에 적절히 놓기.
-5. 장바구니 꺼내는 모션 설계.
-6. 컨베이어 벨트 모듈과 연결
