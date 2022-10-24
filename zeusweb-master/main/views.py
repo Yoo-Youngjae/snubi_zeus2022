@@ -15,18 +15,29 @@ from cv_bridge import CvBridge
 import rospy
 import time
 import mediapipe as mp
-
-
-product_name = ['AlmondMilk', 'AppleJuice', 'Carrot', 'ChocolateMilk', 'Clock', 'Doraemon', 'Egg', 'Fish', 'GardeningSet',
-                'JellO', 'RoundBread', 'Soap', 'Sponge', 'SquareBread','StrawberryMilk', 'SweetPotato', 'Tea', 'Tomato', 'WetTissue']
-
-product_price = [1500, 1200, 1700, 1300, 2000, 1600, 2000, 3200, 1800, 2000, 4800, 2000, 1500, 3500, 800, 1400, 4500, 4200, 3000]
+product_info = [['아몬드브리즈 오리지널 190ml', 800],
+                ['당근 1입(봉)', 2480],
+                ['아동용 시계인형', 2000],
+                ['[남양]초코에몽 250ml', 1000],
+                ['촉촉란(2구)', 1500],
+                ['[냉장]노르웨이 간고등어(특,400g)', 5980],
+                ['방울토마토씨앗 흙 화분세트', 1000],
+                ['[밀크앤허니]모닝빵', 1000],
+                ['도브 뷰티바(비누) 100g', 1530],
+                ['[스카치브라이트]올인원수세미', 1000],
+                ['[삼립]토스트를 위해 태어난 식빵', 2400],
+                ['[서울우유]딸기우유 200ml', 880],
+                ['호박 고구마 1입(봉)', 500],
+                ['[오설록]삼다꿀배티(20개입)', 9500],
+                ['대추방울 토마토 200g', 2900],
+                ['[깨끗한나라]물티슈(100매)', 500]]
 
 total_price = 0
 products = []
 object_list = []
 page = 1
 user = 0 # default = 0(비회원)
+MILK_CLASS_NUM = 11
 
 def main(request):
     global page, total_price, products, object_list, user
@@ -50,9 +61,7 @@ def main(request):
 
 def play_beep(idx):
     print('object_len', idx)
-    # todo 묵음때매 안나옴.
     playsound("/home/snubi/PycharmProjects/snubi_zeus2022/zeusweb-master/beep.mp3")
-    #playsound("/home/snubi/PycharmProjects/snubi_zeus2022/stt/tts_audio/2-1-1.mp3")
 
 
 class SubscribeTester:
@@ -97,12 +106,15 @@ class SubscribeTester:
                         if self.item_dict[i] >= count_threshold and i not in object_list:
                             # ui 에 item 추가
                             object_list.append(i)
-                            products.append([product_name[i], 1, product_price[i]])
+                            products.append([product_info[i][0], 1, product_info[i][1], i])
+                            #products.append([product_name[i], 1, product_price[i], i])
                             t = threading.Thread(target=play_beep, args=(len(object_list),))
                             t.start()
                             # playsound("/home/snubi/PycharmProjects/snubi_zeus2022/zeusweb-master/beep.mp3")
+                            if i == MILK_CLASS_NUM:
+                                continue
                             global total_price
-                            total_price += product_price[i]
+                            total_price += product_info[i][1]
                             print(products)
 
                     elif i not in self.item_prev_list and self.item_dict[i] == 0: # first appear

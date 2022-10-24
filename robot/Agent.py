@@ -17,7 +17,10 @@ class Agent:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # socket() 소켓서버 생성
         self.client_socket.connect((ip_addr, port))  # address에 있는 원격 소켓에 연결
 
-        self.face_origin_img = None
+        # init needed
+        self.face_crop_img = None
+        self.exist_egg = False
+
         self.bridge = CvBridge()
         self.belt_pub = rospy.Publisher('/belt_switch', Int16, queue_size=2)
         self.user_id_pub = rospy.Publisher('/user_id', Int16, queue_size=2)
@@ -25,6 +28,7 @@ class Agent:
         _image_sub = rospy.Subscriber('/face_crop_img', Image, self._face_crop_callback)
         self.stt_controller = STTController()
         self.face_id_controller = FaceId()
+
 
 
 
@@ -105,4 +109,8 @@ class Agent:
         print('detect user :', user_name)
         user_id = checked_id + 1
         return user_id
+
+    def init_variable(self):
+        self.face_crop_img = None
+        self.exist_egg = None
 

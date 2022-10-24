@@ -28,11 +28,20 @@
 <!-- 2번 화면 -->
 {% if page == 2 %}
 <div class="center">
-  <img src="{% static 'main/img/0page.gif' %}"  style = "width:1000px; height:580px; margin-top: 40pt"> <br>
+    {% if user == 1 %}
+    <!-- 김준오 -->
+    <img src="{% static 'main/img/animation_hi_juno.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+    {% elif user == 2 %}
+    <!-- 박예솔 -->
+    <img src="{% static 'main/img/animation_hi_yesol.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+    {% else %}'
+    <img src="{% static 'main/img/animation_hi_gogaek.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+    {% endif %}
+<!--  <img src="{% static 'main/img/0page.gif' %}"  style = "width:1000px; height:580px; margin-top: 40pt"> <br>-->
   <!-- 3번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="3" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit" >Detectron Page</button>
+    <button id="move_page2" name="move_page" value="3" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit" >Detectron Page</button>
   </form>
 </div>
 
@@ -51,12 +60,22 @@
                     <th>가격</th>
                 </tr>
                 {% for product in products %}
+                {% if product.3 == 11 %} <!-- MILK_CLASS_NUM = 14 -->
+                <tr class="text-center" style = "color: red ; text-decoration: line-through;">
+                    <td>{{forloop.counter}}</td>
+                    <td>{{product.0}}</td>
+                    <td>{{product.1}}</td>
+                    <td>{{product.2}}</td>
+                </tr>
+                {% else %}
                 <tr class="text-center">
                     <td>{{forloop.counter}}</td>
                     <td>{{product.0}}</td>
                     <td>{{product.1}}</td>
                     <td>{{product.2}}</td>
                 </tr>
+                {% endif %}
+
                 {% endfor %}
             </table>
         </div>
@@ -64,7 +83,7 @@
     </div>
 
     <div style="width:49%; height: 600px; float:right;">
-        <table class="col-md-15" id="star_table" style = "width:100%;">
+        <table class="col-md-15" id="star_table2" style = "width:100%;">
             <tr class="text-center"><p><h5><b>계산대의 물건을 확인하세요! {{name}}</b></h5></p></tr><br>
             <tr>
                 <td>
@@ -80,14 +99,14 @@
 </div>
 <form method="POST" style="float:left">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="4" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">장바구니 결제</button>
+    <button id="move_page3" name="move_page" value="4" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">장바구니 결제</button>
 </form>
 
 <!-- 4번 화면 -->
 {% elif page == 4 %}
 <div class="row" style="margin-left:50px; margin-right:50px; margin-top:10px; overflow:hidden;">
   <div class="center" style="width:69%; float:left;">
-    <img src="{% static 'main/img/2page.gif' %}" style="margin-top: 70pt; width: 800px; height: 480px"> <br>
+    <img src="{% static 'main/img/animation_4thpage.gif' %}" style="margin-top: 70pt; width: 800px; height: 480px"> <br>
   </div>
   
   <div style="width:29%; float:right;">
@@ -113,32 +132,33 @@
     <!-- 5번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="5" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">GOOD BYE~</button>
+    <button id="move_page4" name="move_page" value="5" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">GOOD BYE~</button>
   </form>
 </div>
 
 <!-- 5번 화면 -->
 {% elif page == 5 %}
 <div class="center">
-  <img src="{% static 'main/img/3page.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+  <img src="{% static 'main/img/animation_thankyou.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
   <!-- 1번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page" name="move_page" value="1" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">처음화면</button>
+    <button id="move_page5" name="move_page" value="1" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">처음화면</button>
   </form>
 </div>
 
 <!-- 1번 화면 -->
 {% else %}
-<div class="row" style="margin-left:5px; margin-right:5px;margin-top:10px overflow:hidden;">
+<div class="row" style="margin-left:5px; margin-right:5px;margin-top:10px; overflow:hidden;">
   <div class="left" style="width:49%; float:left;">
-    <img src="{% static 'main/img/nubi.gif' %}" style="margin-top: 70pt; width: 800px; height: 480px"> <br>
+    <img src="{% static 'main/img/animation_1page.gif' %}" style="margin-left: 30pt; margin-top: 5pt; width: 600px; height: 600px"> <br>
   </div>
 
  <div class="right" style="width:49%; float:right;">
       <div style="margin-top:10pt;margin-right:50px;">
-         <table class="col-md-15" id="star_table" style = "width:100%;">
-            <tr class="text-center" style = "text-align: center"><p><h5><b> 얼굴을 가까이 와주세요!</b></h5></p></tr><br>
+         <table class="col-md-15" id="star_table3" style = "width:100%;">
+<!--            <tr class="text-center" style = "text-align: center"><p><h5><b> 얼굴을 가까이 와주세요!</b></h5></p></tr><br>-->
+            <div style = "margin-top: 50pt"></div>
             <tr>
                 <td>
                     <img src="http://127.0.0.1:8000/face" style="width: 620px; height: 480px"/>
@@ -151,7 +171,7 @@
 <div class = "center">
     <form method="POST" style="float:left">
         {% csrf_token %}
-        <button id="move_page" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">Welcome Page</button>
+        <button id="move_page1" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">Welcome Page</button>
     </form>
 </div>
 {% endif %}
@@ -168,7 +188,7 @@
     });
 </script>
 <script>
-    $('#move_page').val();
+    $('.move_page').val();
     $(document).fromId.submit();
 </script>
 <script>

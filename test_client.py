@@ -33,7 +33,7 @@ pass_though3 = [38, 0, -180, 0, -110, 0]
 if __name__ == '__main__':
     try:
         agent = Agent()
-        ser = serial.Serial('/dev/ttyUSB0', 9600)
+        ser = serial.Serial(BELT_USB_PORT, 9600)
         while True:
             test_case = input('command : ')
             if test_case == 'h':

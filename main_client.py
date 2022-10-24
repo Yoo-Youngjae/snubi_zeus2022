@@ -10,13 +10,12 @@ import threading
 
 
 def main_pick_and_place(agent):
-    agent.belt_on()
+    # agent.belt_on()
     agent.open_gripper()
     start_time = time.time()
     agent.movej(HOME_POS, rel=False)
     time.sleep(3)
     object_start_time = None
-    exist_egg = False
     while time.time() - start_time <= BELT_MAX_TIME:
         if object_start_time is None:
             object_start_time = time.time()
@@ -27,7 +26,7 @@ def main_pick_and_place(agent):
             print(round(time.time() - object_start_time))
             time.sleep(1)
             if time.time() - object_start_time >= BELT_STOP_TIME:  # 10 초이상 물체 등장 안함
-                return exist_egg
+                return
             continue
         object_start_time = None
         target_object_x, target_object_y = center_coordinate_list[0], center_coordinate_list[1]
@@ -56,7 +55,7 @@ def main_pick_and_place(agent):
         if int(object_class) == EGG_CLASS_NUM:
             agent.movel([0, 0, 260, 0, 0, 0])
             speak_secnario('3-2')
-            exist_egg = True
+            agent.exist_egg = True
             agent.movej(EGG_POS, rel=False)
             agent.movel([0, 0, -80, 0, 0, 0])
             agent.open_gripper()
@@ -79,7 +78,7 @@ def main_pick_and_place(agent):
 
             agent.movej(HOME_POS, rel=False)
 
-    return exist_egg
+    return agent.exist_egg
 def pass_though(agent):
     pass_though1 = [68, 0, -180, 0, 110, 0]
     pass_though1 = [68, 0, -180, 0, 110, 0]
@@ -129,11 +128,11 @@ def welcome_motion(agent):
     agent.movej([0, 0, 0, 0, 10, 0], rel=True)
     agent.movej([0, 0, 0, 0, -20, 0], rel=True)
     agent.movej([0, 0, 0, 0, 20, 0], rel=True)
-    agent.movej([0, 0, 0, 0, -10, 0], rel=True)
+    agent.movej([0, 0, 0, 0, -20, 0], rel=True)
 
-    agent.movel([150, 0, 0, 0, 0, 0], rel=True)
-    agent.movel([-150, 0, -150, 0, 0, 0], rel=True)
-    agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+    # agent.movel([150, 0, 0, 0, 0, 0], rel=True)
+    # agent.movel([-150, 0, -150, 0, 0, 0], rel=True)
+    # agent.movel([150, 0, 0, 0, 0, 0], rel=True)
 
     agent.movej(welcome_pose2)
     agent.close_gripper()
@@ -162,7 +161,11 @@ def main_jokim(agent):
     speak_secnario('7')
 
 def main_full(agent):
-    speak_secnario('1')
+    agent.movej(HOME_POS)
+    t = threading.Thread(target=speak_secnario, args=('1',))
+    t.start()
+    time.sleep(2)
+    welcome_motion(agent)
     while True:
         print('1. start. go to home pose')
         agent.movej(HOME_POS)
@@ -173,17 +176,16 @@ def main_full(agent):
     print('1-2. detected_user_id', detected_user_id)
 
     # 2. user detection & welcome motion
+    time.sleep(2)
     agent.ui_page_go(2)
-    t = threading.Thread(target=speak_secnario, args=('2', detected_user_id))
-    t.start()
-    welcome_motion(agent)
-    exist_egg = False
+    speak_secnario('2', detected_user_id)
+    # detectron page
+    agent.ui_page_go(3)
     while True:
-        # detectron page
-        agent.ui_page_go(3)
+        agent.belt_on()
         print('2. belt_on. calc start')
         speak_secnario('3-1')
-        exist_egg = main_pick_and_place(agent)
+        main_pick_and_place(agent)
         print('3. end calc.')
         agent.belt_off()
         speak_secnario('3-4')
@@ -192,7 +194,7 @@ def main_full(agent):
             break
 
     # egg go to basket
-    if exist_egg:
+    if agent.exist_egg:
         speak_secnario('3-5')
         place_egg(agent)
 
@@ -209,6 +211,7 @@ if __name__ == '__main__':
         while True:
             test_case = input('what is your name : ')
             if test_case == 'full':
+                agent.init_variable()
                 main_full(agent)
                 agent.belt_off()
             if test_case == 'pp': # here is for yjyoo
