@@ -1,11 +1,11 @@
 import requests
 import torch
 from omegaconf import OmegaConf
-from stt.silero_models.src.silero.utils import (init_jit_model,
-                       split_into_batches,
-                       read_audio,
-                       read_batch,
-                       prepare_model_input)
+from STT.silero_models.src.silero.utils import (init_jit_model,
+                                                split_into_batches,
+                                                read_audio,
+                                                read_batch,
+                                                prepare_model_input)
 import numpy as np
 import sounddevice as sd
 from beepy import beep
@@ -13,7 +13,7 @@ from beepy import beep
 class STTController:
     def __init__(self):
         self.device = torch.device('cpu')  # gpu also works, but our models are fast enough for CPU
-        models = OmegaConf.load('/home/snubi/PycharmProjects/snubi_zeus2022/stt/silero_models/models.yml')
+        models = OmegaConf.load('STT/silero_models/models.yml')
         self.model, self.decoder = init_jit_model(models.stt_models.en.v3.jit, device=self.device)
 
     def stt(self, SEC=3, FS = 16000):
@@ -29,7 +29,7 @@ class STTController:
                     'a you', 'annu', 'nineu', 'on your', 'and your', 'a new',
                     'a knew', 'are knew', 'anewor', 'h knew', 'on you',
                     'and no', 'oh you', 'anneo', 'i knew', 'i know',
-                    'i you', 'are you']
+                    'i you', 'are you', 'when you\'re', 'any', 'annie', 'anie']
         beep('coin')
         record = sd.rec(FS * SEC, samplerate=FS, channels=1)
         sd.wait()
@@ -42,10 +42,16 @@ class STTController:
         for example in output:
             result += self.decoder(example.cpu())
         print('[STT]', result)
-        if result not in neg_list:
-            return 'yes'
-        else:
+
+        if len(result) >0 and result[0] == 'a':
+            print('[STT] negative')
             return 'no'
+        elif result in neg_list:
+            print('[STT] negative')
+            return 'no'
+        else:
+            print('[STT] positive')
+            return 'yes'
 
 def stt_naver(audio_file):
     Lang = "Kor" # Kor / Jpn / Chn / Eng

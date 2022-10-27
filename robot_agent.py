@@ -3,7 +3,7 @@
 from robot.Agent import Agent
 
 # add jokim
-from stt.TextToSpeech import speak_secnario
+from STT.TextToSpeech import speak_secnario
 import time
 from robot_global_variable import *
 import threading
@@ -32,22 +32,33 @@ def main_pick_and_place(agent):
         target_object_x, target_object_y = center_coordinate_list[0], center_coordinate_list[1]
         object_angle, object_class = center_coordinate_list[2], center_coordinate_list[3]
 
-        if target_object_x < 950:
+        if target_object_x < 1035:
             print('1-1) objects coord is too far to pick', (target_object_x, target_object_y), object_angle)
             continue
         print('1) objects coord', (target_object_x, target_object_y), object_angle)
-        y_offset = int((400 - target_object_y) // 15 * 10) + 70
+        # vision_robot calibration
+        x_offset = -145
+        y_offset = int((360 - target_object_y) // (174 / 90)) + 95
+        z_offset = 95
         gripper_angle = 90 - object_angle
+        if int(object_class) == MILK_CLASS_NUM:
+            x_offset = -160
+
 
         # 2. detection object and get distance
-        print('2) y_offset, gripper_angle', y_offset, gripper_angle)
-        xyz = [-135, y_offset, 0]
+        print('2) x_offset, y_offset, gripper_angle', x_offset, y_offset, gripper_angle)
+        xyz = [x_offset, y_offset, 0]
         xyz += [0, 0, gripper_angle] # for rx,ry,rz
         # 3. go to the object
         agent.movel(xyz)
-        z_offset = 95
+
         agent.movel([0, 0, -z_offset, 0, 0, 0])
         # 4. grasp
+        # test_mode = False
+        # if test_mode:
+        #     time.sleep(3)
+        #     continue
+        #################################
         agent.close_gripper()
         # 5. go to place position
         agent.movej(HOME_POS)
@@ -109,14 +120,20 @@ def place_motion(agent):
     agent.movel([0, 0, 170, 0, 0, 0])
     agent.movel([0, 200, 0, 0, 0, 0])
     agent.movej(basket_pos2)
-    agent.movel([0, 0, -40, 0, 0, 0])
-    agent.movel([10, 150, 0, 0, 0, 0])
+    agent.movel([0, 0, -50, 0, 0, 0])
+    agent.movel([15, 150, 0, 0, 0, 0])
     agent.close_gripper()
-    agent.movel([0, 0, 280, 0, 0, 0])
+    agent.movel([0, 0, 290, 0, 0, 0])
     agent.movel([0, -120, 0, 0, 0, 0])
-    agent.movel([-90, 0, -90, 0, 0, 0])
+    agent.movel([-95, 0, -90, 0, 0, 0])
     agent.movej(basket_pos3)
     agent.open_gripper()
+
+def return_place_motion(agent):
+    agent.open_gripper()
+    agent.movej([0, 0, 0, 0, 0, 0])
+    agent.movej(HOME_POS)
+
 
 def welcome_motion(agent):
     welcome_pose1 = [55, -15, -97, 0, 109, 49]
@@ -152,13 +169,6 @@ def place_egg(agent):
     agent.movej(HOME_POS, rel=False)
 
 
-def main_jokim(agent):
-    print("Start shopping")
-
-    agent.movej(HOME_POS)
-    place_motion(agent)
-
-    speak_secnario('7')
 
 def main_full(agent):
     agent.movej(HOME_POS)
@@ -175,6 +185,55 @@ def main_full(agent):
             break
     print('1-2. detected_user_id', detected_user_id)
 
+    # 2. user detection & welcome motion
+    time.sleep(2)
+    agent.ui_page_go(2)
+    speak_secnario('2', detected_user_id)
+    # detectron page
+    agent.ui_page_go(3)
+
+    motion_up_test_mode = True
+    while True:
+        agent.belt_on()
+        if motion_up_test_mode:
+            agent.motionparam_up()
+        print('2. belt_on. calc start')
+        speak_secnario('3-1')
+        main_pick_and_place(agent)
+        print('3. end calc.')
+        agent.belt_off()
+        if motion_up_test_mode:
+            agent.motionparam_down()
+        speak_secnario('3-4')
+        stt_res = agent.stt_controller.stt(SEC=3)
+        if stt_res == 'yes':
+            break
+
+    # egg go to basket
+    if agent.exist_egg:
+        speak_secnario('3-5')
+        place_egg(agent)
+
+    agent.ui_page_go(4)
+    speak_secnario('4')
+    place_motion(agent)
+    agent.ui_page_go(5)
+    speak_secnario('5')
+    agent.ui_page_go(1)
+
+def main_custom(agent):
+    agent.movej(HOME_POS)
+    t = threading.Thread(target=speak_secnario, args=('1',))
+    t.start()
+    time.sleep(2)
+    welcome_motion(agent)
+
+    print('1. start. go to home pose')
+    agent.movej(HOME_POS)
+    detected_user_id = 3
+    agent.user_id_go(detected_user_id)
+
+    print('1-2. detected_user_id', detected_user_id)
     # 2. user detection & welcome motion
     time.sleep(2)
     agent.ui_page_go(2)
@@ -209,22 +268,25 @@ if __name__ == '__main__':
     try:
         agent = Agent()
         while True:
-            test_case = input('what is your name : ')
+            test_case = input('Select scenario : ')
             if test_case == 'full':
                 agent.init_variable()
                 main_full(agent)
                 agent.belt_off()
-            if test_case == 'pp': # here is for yjyoo
+            if test_case == 'custom':
+                agent.init_variable()
+                main_custom(agent)
+                agent.belt_off()
+            if test_case == 'pp':
+                agent.belt_on()
                 main_pick_and_place(agent)
                 agent.belt_off()
-            elif test_case == 'jokim': # here is for jokim
-                main_jokim(agent)
+            if test_case == 'basket':
+                place_motion(agent)
+            if test_case == 'return_basket':
+                return_place_motion(agent)
             if test_case == 'quit' or test_case == 'q':
                 break
-            if test_case >= '0' and test_case <= '4':
-                agent.ui_page_go(test_case)
-            if test_case >= '11' and test_case <= '13':
-                agent.user_id_go(test_case[1])
     except Exception as e:
         print(e)
     finally:

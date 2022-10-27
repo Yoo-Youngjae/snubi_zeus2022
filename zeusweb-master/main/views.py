@@ -15,24 +15,25 @@ from cv_bridge import CvBridge
 import rospy
 import time
 import mediapipe as mp
-product_info = [['아몬드브리즈 오리지널 190ml', 800],
-                ['당근 1입(봉)', 2480],
-                ['아동용 시계인형', 2000],
-                ['[남양]초코에몽 250ml', 1000],
-                ['촉촉란(2구)', 1500],
-                ['[냉장]노르웨이 간고등어(특,400g)', 5980],
-                ['방울토마토씨앗 흙 화분세트', 1000],
-                ['[밀크앤허니]모닝빵', 1000],
-                ['도브 뷰티바(비누) 100g', 1530],
-                ['[스카치브라이트]올인원수세미', 1000],
-                ['[삼립]토스트를 위해 태어난 식빵', 2400],
-                ['[서울우유]딸기우유 200ml', 880],
-                ['호박 고구마 1입(봉)', 500],
-                ['[오설록]삼다꿀배티(20개입)', 9500],
-                ['대추방울 토마토 200g', 2900],
-                ['[깨끗한나라]물티슈(100매)', 500]]
+product_info = [['아몬드브리즈 오리지널 190ml', 800, '800'],
+                ['당근 1입(봉)', 2480, '2,480'],
+                ['아동용 시계인형', 2000, '2,000'],
+                ['[남양]초코에몽 250ml', 1000, '1,000'],
+                ['촉촉란(2구)', 1500, '1,500'],
+                ['[냉장]노르웨이 간고등어(특,400g)', 5980, '5,980'],
+                ['방울토마토씨앗 흙 화분세트', 1000, '1,000'],
+                ['[밀크앤허니]모닝빵', 1000, '1,000'],
+                ['도브 뷰티바(비누) 100g', 1530, '1,530'],
+                ['[스카치브라이트]올인원수세미', 1000, '1,000'],
+                ['[삼립]토스트를 위해 태어난 식빵', 2400, '2,400'],
+                ['[서울우유]딸기우유 200ml', 880, '880'],
+                ['호박 고구마 1입(봉)', 500, '500'],
+                ['[오설록]삼다꿀배티(20개입)', 9500, '9,500'],
+                ['대추방울 토마토 200g', 2900, '2,900'],
+                ['[깨끗한나라]물티슈(100매)', 500, '500']]
 
 total_price = 0
+total_price_str = '0'
 products = []
 object_list = []
 page = 1
@@ -40,7 +41,7 @@ user = 0 # default = 0(비회원)
 MILK_CLASS_NUM = 11
 
 def main(request):
-    global page, total_price, products, object_list, user
+    global page, total_price, total_price_str, products, object_list, user
     if request.method == 'POST': # 지금은 버튼 이벤트로 1을 받아오도록 구현
         if request.POST.get("move_page") != None: # python request test용
             # User 정보 받아오는거 구현
@@ -54,10 +55,11 @@ def main(request):
                 subscribe_tester.item_prev_list = []
                 user = 0
                 total_price = 0
+                total_price_str = '0'
                 products = []
                 object_list = []
 
-    return render(request, 'main/main.html', {'products': products, 'total': total_price, 'page': page, 'user': user})
+    return render(request, 'main/main.html', {'products': products, 'total': total_price_str, 'page': page, 'user': user})
 
 def play_beep(idx):
     print('object_len', idx)
@@ -106,15 +108,18 @@ class SubscribeTester:
                         if self.item_dict[i] >= count_threshold and i not in object_list:
                             # ui 에 item 추가
                             object_list.append(i)
-                            products.append([product_info[i][0], 1, product_info[i][1], i])
+                            products.append([product_info[i][0], 1, product_info[i][2], i])
                             #products.append([product_name[i], 1, product_price[i], i])
                             t = threading.Thread(target=play_beep, args=(len(object_list),))
                             t.start()
                             # playsound("/home/snubi/PycharmProjects/snubi_zeus2022/zeusweb-master/beep.mp3")
                             if i == MILK_CLASS_NUM:
                                 continue
-                            global total_price
+                            global total_price, total_price_str
                             total_price += product_info[i][1]
+                            total_price_str = str(total_price)
+                            if len(total_price_str) >= 4:
+                                total_price_str = str(total_price)[:-3]+','+str(total_price)[-3:]
                             print(products)
 
                     elif i not in self.item_prev_list and self.item_dict[i] == 0: # first appear

@@ -3,7 +3,7 @@ import rospy
 from PIL import Image as PILImage
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16, Int32MultiArray
-from stt.SpeechRecognition import STTController
+from STT.SpeechRecognition import STTController
 from cv_bridge import CvBridge
 import cv2
 import requests
@@ -80,6 +80,12 @@ class Agent:
 
     def close_gripper(self):
         self.send('close_gripper')
+
+    def motionparam_up(self):
+        self.send('motionparam_up')
+
+    def motionparam_down(self):
+        self.send('motionparam_down')
 
     def belt_on(self):
         self.belt_pub.publish(1)

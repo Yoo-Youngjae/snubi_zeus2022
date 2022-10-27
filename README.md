@@ -29,7 +29,7 @@ detectron model 코드
 ### Client Node
 - 시나리오 코드를 실행할 경우
 ```Shell
-   (venv) python main_client.py 
+   (venv) python robot_agent.py 
    >>> what is your name : [시나리오 코드 입력]
    ```
 

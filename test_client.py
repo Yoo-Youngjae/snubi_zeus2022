@@ -4,7 +4,7 @@ from robot.Agent import Agent
 import serial
 import time
 from robot_global_variable import *
-from stt.TextToSpeech import speak_secnario
+from STT.TextToSpeech import speak_secnario
 import threading
 
 home_pos = [68, -9, -102, 0, -69, 69]
@@ -101,6 +101,7 @@ if __name__ == '__main__':
                 agent.movej(home_pos)
                 agent.movel([-90, 90, 0, 0, 0, 0])
                 agent.movel([0, 0, -95, 0, 0, 0])
+                continue
                 agent.close_gripper()
                 agent.movej(home_pos)
                 agent.open_gripper()

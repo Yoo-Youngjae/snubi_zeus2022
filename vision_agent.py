@@ -78,6 +78,11 @@ if __name__ == '__main__':
         # exception handling
         if len(center_coordinate_list) > 0: # some object detected
             print(center_coordinate_list[0])
+            # # todo : delete
+            # test_mode = True
+            # if test_mode:
+            #     continue
+            #####################
             if center_coordinate_list[0][0] > 1000: # [stop] wait for robot picking
                 vision_agent.belt_on_off(0)
             else:

@@ -14,7 +14,6 @@
 
 {% block main %}
 
-
 <!-- banner 화면(detectron) -->
 <div id = "zeus_page">
     <header>
@@ -41,7 +40,7 @@
   <!-- 3번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page2" name="move_page" value="3" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit" >Detectron Page</button>
+    <button id="move_page2" name="move_page" value="3" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: white" type="submit" >Detectron Page</button>
   </form>
 </div>
 
@@ -54,7 +53,7 @@
         <div id="scroll_div" style="overflow:auto; max-height: 100%; display: flex; flex-direction: column-reverse;">
             <table class="col-md-15" id="star_table" style = "width:100%; border:0; cellspacing:0; cellpadding:0">
                 <tr class="text-center">
-                    <th>No</th>
+                    <th>번호</th>
                     <th>이름</th>
                     <th>개수</th>
                     <th>가격</th>
@@ -95,11 +94,11 @@
 </div>
 
 <div style="width:49%; float:left; margin-left: 40px">
-    <p><h4>total: {{total}}</h4></p>
+    <p><h4>총액: {{total}}</h4></p>
 </div>
 <form method="POST" style="float:left">
     {% csrf_token %}
-    <button id="move_page3" name="move_page" value="4" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">장바구니 결제</button>
+    <button id="move_page3" name="move_page" value="4" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: white" type="submit">장바구니 결제</button>
 </form>
 
 <!-- 4번 화면 -->
@@ -132,7 +131,7 @@
     <!-- 5번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page4" name="move_page" value="5" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">GOOD BYE~</button>
+    <button id="move_page4" name="move_page" value="5" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: white" type="submit">GOOD BYE~</button>
   </form>
 </div>
 
@@ -143,7 +142,7 @@
   <!-- 1번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}
-    <button id="move_page5" name="move_page" value="1" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">처음화면</button>
+    <button id="move_page5" name="move_page" value="1" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: white" type="submit">처음화면</button>
   </form>
 </div>
 
@@ -168,10 +167,10 @@
     </div>
 </div>
 </div>
-<div class = "center">
+<div class = "center" style="margin-left: 500pt">
     <form method="POST" style="float:left">
         {% csrf_token %}
-        <button id="move_page1" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 15pt; background-color: transparent; color: lightgray" type="submit">Welcome Page</button>
+        <button id="move_page1" name="move_page" value="2" style="border : 0; outline : 0; margin-top: 10pt; background-color: transparent; color: white" type="submit">Welcome Page</button>
     </form>
 </div>
 {% endif %}
