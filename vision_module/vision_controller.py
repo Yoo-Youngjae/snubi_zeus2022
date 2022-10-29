@@ -10,7 +10,7 @@ from detectron2.data import MetadataCatalog
 from detectron2.config import get_cfg
 import math
 
-#barcode_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/barcode.yaml'
+#zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_real_final_3.yaml'
 zeus_cfg = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_1022_delete.yaml'
 
 class DetectronController:

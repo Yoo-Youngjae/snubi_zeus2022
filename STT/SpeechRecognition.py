@@ -29,7 +29,8 @@ class STTController:
                     'a you', 'annu', 'nineu', 'on your', 'and your', 'a new',
                     'a knew', 'are knew', 'anewor', 'h knew', 'on you',
                     'and no', 'oh you', 'anneo', 'i knew', 'i know',
-                    'i you', 'are you', 'when you\'re', 'any', 'annie', 'anie']
+                    'i you', 'are you', 'when you\'re', 'any', 'annie', 'anie',
+                    'on it']
         beep('coin')
         record = sd.rec(FS * SEC, samplerate=FS, channels=1)
         sd.wait()
@@ -41,9 +42,9 @@ class STTController:
         result = ""
         for example in output:
             result += self.decoder(example.cpu())
-        print('[STT]', result)
+        # print('[STT]', result)
 
-        if len(result) >0 and result[0] == 'a':
+        if len(result) >0 and (result[0] == 'a' or result[0] == 'i'):
             print('[STT] negative')
             return 'no'
         elif result in neg_list:

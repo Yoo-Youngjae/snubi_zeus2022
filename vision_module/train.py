@@ -46,5 +46,5 @@ def start_train(name, class_num, path, iteration):
 if __name__ == '__main__':
     iteration = 8000
     merge_file_path = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml'
-    start_train('zeus_1022_delete', 16, merge_file_path, iteration) #name, class_num, merge_file_yaml
-    register.register_zeus_snu('zeus_1022_delete', 16, merge_file_path, iteration)
+    start_train('zeus_real_final_4', 16, merge_file_path, iteration) #name, class_num, merge_file_yaml
+    register.register_zeus_snu('zeus_real_final_4', 16, merge_file_path, iteration)

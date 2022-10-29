@@ -6,7 +6,7 @@ import numpy as np
 
 idx = int(input('input new user id : '))
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 mpDraw = mp.solutions.drawing_utils

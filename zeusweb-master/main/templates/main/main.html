@@ -33,10 +33,14 @@
     {% elif user == 2 %}
     <!-- 박예솔 -->
     <img src="{% static 'main/img/animation_hi_yesol.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+    {% elif user == 3 %}
+    <!-- 마스크 -->
+    <img src="{% static 'main/img/animation_hi_jinsoo.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
+
     {% else %}'
     <img src="{% static 'main/img/animation_hi_gogaek.gif' %}" style="margin-top: 40pt; width: 1000px; height: 580px"> <br>
     {% endif %}
-<!--  <img src="{% static 'main/img/0page.gif' %}"  style = "width:1000px; height:580px; margin-top: 40pt"> <br>-->
+<!--  <img src="{% static 'main/img/0pagere.gif' %}"  style = "width:1000px; height:580px; margin-top: 40pt"> <br>-->
   <!-- 3번 화면으로 이동하는 버튼 -->
   <form method="POST">
     {% csrf_token %}

@@ -25,16 +25,17 @@ def register_cfg(name, class_num, weight, merge_file, iteration):
 
 
 def register_zeus_snu(name, class_num, merge_file, iteration):
-    json_path = "/vision_module/data/trainval.json"
-    image_path = "/vision_module/data/images"
-    #merge_file ='/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml'
+    json_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/data/trainval.json"
+    image_path = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/data/images"
+    merge_file ='/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml'
 
     source = "/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/output/model_final.pth"
     destination = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/' + name + '.pth'
     shutil.copyfile(source, destination)
     weight_path = destination
+    #weight_path = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/weight_cfg/zeus_final.pth'
     #registet_dataset(name, json_path, image_path)
     register_cfg(name, class_num, weight_path, merge_file, iteration)
 
 #merge_file_path = '/home/snubi/PycharmProjects/snubi_zeus2022/vision_module/detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml'
-#register_zeus_snu('zeus_r_50', 19, merge_file_path)
+#register_zeus_snu('zeus_final_2', 16, merge_file_path, 10000)

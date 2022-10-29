@@ -11,6 +11,8 @@ def speak_secnario(num, user_id=0):
             playsound("STT/tts_audio/2-1-1.mp3") #반갑습니다 준오님 오늘도 방문해주셔서 감사합니다_
         elif user_id == 2:
             playsound("STT/tts_audio/2-1-2.mp3") #반갑습니다 예솔님 오늘도 방문해주셔서 감사합니다_
+        elif user_id == 3:
+            playsound("STT/tts_audio/2-1-3.mp3")  # 반갑습니다 예솔님 오늘도 방문해주셔서 감사합니다_
         else: # user_id == 0:
             playsound("STT/tts_audio/2-1-0.mp3") #반갑습니다 회원님 오늘도 방문해주셔서 감사합니다_
         playsound("STT/tts_audio/2-2.mp3") #상품 계산을 시작하겠습니다.
